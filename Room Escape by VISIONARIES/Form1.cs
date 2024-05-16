@@ -20,7 +20,7 @@ namespace Room_Escape_by_VISIONARIES
         Bitmap backbuffer2;                          //For room2   
         Bitmap sprite;
         Bitmap dialog;
-        int characSize = 500;       
+        int characSize = 100;       
         Rectangle rectDest;
 
         public frmMain()
@@ -32,16 +32,6 @@ namespace Room_Escape_by_VISIONARIES
             //Make every image screen size
             backbuffer1 = new Bitmap(frmG.picBack1.Image,Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             backbuffer2 = new Bitmap(frmG.picBack2.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-
-
-            //Arrow location
-            int arrowX = Screen.PrimaryScreen.Bounds.Width - 110;
-            int arrowY = Screen.PrimaryScreen.Bounds.Height - 150;
-            int arrowXL = Screen.PrimaryScreen.Bounds.Width - 1380;
-            picArrowR.Location = new Point(arrowX, arrowY);
-            picArrowL.Location = new Point(arrowXL, arrowY);
-
-            //Dialog Box
 
 
 
