@@ -16,7 +16,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             InitializeComponent();
         }
-
+        public event EventHandler dialogBoxClicked;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 

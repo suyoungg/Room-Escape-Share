@@ -32,12 +32,13 @@
             this.picBack1 = new System.Windows.Forms.PictureBox();
             this.picBack2 = new System.Windows.Forms.PictureBox();
             this.picSprite = new System.Windows.Forms.PictureBox();
-            this.lblDialogBox = new System.Windows.Forms.Label();
-            this.picBeds = new System.Windows.Forms.PictureBox();
+            this.picRiddler = new System.Windows.Forms.PictureBox();
+            this.picBack3 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.picBack1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picSprite)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picBeds)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picRiddler)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack3)).BeginInit();
             this.SuspendLayout();
             // 
             // picBack1
@@ -53,50 +54,48 @@
             // picBack2
             // 
             this.picBack2.Image = ((System.Drawing.Image)(resources.GetObject("picBack2.Image")));
-            this.picBack2.Location = new System.Drawing.Point(468, 12);
-            this.picBack2.Margin = new System.Windows.Forms.Padding(2);
+            this.picBack2.Location = new System.Drawing.Point(291, 12);
+            this.picBack2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.picBack2.Name = "picBack2";
-            this.picBack2.Size = new System.Drawing.Size(114, 106);
+            this.picBack2.Size = new System.Drawing.Size(298, 269);
             this.picBack2.TabIndex = 1;
             this.picBack2.TabStop = false;
             // 
             // picSprite
             // 
             this.picSprite.Image = ((System.Drawing.Image)(resources.GetObject("picSprite.Image")));
-            this.picSprite.Location = new System.Drawing.Point(489, 132);
+            this.picSprite.Location = new System.Drawing.Point(584, 28);
             this.picSprite.Name = "picSprite";
-            this.picSprite.Size = new System.Drawing.Size(299, 317);
+            this.picSprite.Size = new System.Drawing.Size(179, 317);
             this.picSprite.TabIndex = 2;
             this.picSprite.TabStop = false;
             // 
-            // lblDialogBox
+            // picRiddler
             // 
-            this.lblDialogBox.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lblDialogBox.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDialogBox.Location = new System.Drawing.Point(167, 303);
-            this.lblDialogBox.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblDialogBox.Name = "lblDialogBox";
-            this.lblDialogBox.Size = new System.Drawing.Size(452, 105);
-            this.lblDialogBox.TabIndex = 3;
-            this.lblDialogBox.Text = "label1";
-            this.lblDialogBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.picRiddler.Image = ((System.Drawing.Image)(resources.GetObject("picRiddler.Image")));
+            this.picRiddler.Location = new System.Drawing.Point(479, 12);
+            this.picRiddler.Name = "picRiddler";
+            this.picRiddler.Size = new System.Drawing.Size(199, 336);
+            this.picRiddler.TabIndex = 5;
+            this.picRiddler.TabStop = false;
             // 
-            // picBeds
+            // picBack3
             // 
-            this.picBeds.Image = ((System.Drawing.Image)(resources.GetObject("picBeds.Image")));
-            this.picBeds.Location = new System.Drawing.Point(87, 52);
-            this.picBeds.Name = "picBeds";
-            this.picBeds.Size = new System.Drawing.Size(299, 274);
-            this.picBeds.TabIndex = 4;
-            this.picBeds.TabStop = false;
+            this.picBack3.Image = ((System.Drawing.Image)(resources.GetObject("picBack3.Image")));
+            this.picBack3.Location = new System.Drawing.Point(129, 83);
+            this.picBack3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.picBack3.Name = "picBack3";
+            this.picBack3.Size = new System.Drawing.Size(147, 129);
+            this.picBack3.TabIndex = 6;
+            this.picBack3.TabStop = false;
             // 
             // frmStorage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.picBeds);
-            this.Controls.Add(this.lblDialogBox);
+            this.Controls.Add(this.picBack3);
+            this.Controls.Add(this.picRiddler);
             this.Controls.Add(this.picSprite);
             this.Controls.Add(this.picBack2);
             this.Controls.Add(this.picBack1);
@@ -106,7 +105,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBack1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picSprite)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picBeds)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picRiddler)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack3)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -115,8 +115,8 @@
 
         public System.Windows.Forms.PictureBox picBack1;
         public System.Windows.Forms.PictureBox picBack2;
+        public System.Windows.Forms.PictureBox picBack3;
         public System.Windows.Forms.PictureBox picSprite;
-        public System.Windows.Forms.Label lblDialogBox;
-        public System.Windows.Forms.PictureBox picBeds;
+        public System.Windows.Forms.PictureBox picRiddler;
     }
 }
