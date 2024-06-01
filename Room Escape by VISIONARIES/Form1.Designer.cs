@@ -74,7 +74,6 @@
             this.Text = "Room Escape";
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.frmMain_Paint);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.frmMain_MouseDown);
             ((System.ComponentModel.ISupportInitialize)(this.picArrowL)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picArrowR)).EndInit();
             this.ResumeLayout(false);

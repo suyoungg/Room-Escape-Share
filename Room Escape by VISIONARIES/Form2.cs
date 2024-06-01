@@ -13,6 +13,7 @@ namespace Room_Escape_by_VISIONARIES
     public partial class frmGraphic : Form
     {
         public static frmGraphic instance;
+        frmMain frmM = new frmMain();
         Graphics g;
         Bitmap backbuffer2;
         frmStorage frmG = new frmStorage();
@@ -26,6 +27,8 @@ namespace Room_Escape_by_VISIONARIES
         private void frmGraphic_Load(object sender, EventArgs e)
         {
             backbuffer2 = new Bitmap(frmG.picBack2.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+           // frmM.Beds.Click += frmM.beds_click;
+
         }
 
         private void frmGraphic_Paint(object sender, PaintEventArgs e)

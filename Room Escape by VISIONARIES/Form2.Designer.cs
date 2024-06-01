@@ -33,8 +33,8 @@
             // 
             // btnTransition
             // 
-            this.btnTransition.Location = new System.Drawing.Point(644, 11);
-            this.btnTransition.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnTransition.Location = new System.Drawing.Point(421, 144);
+            this.btnTransition.Margin = new System.Windows.Forms.Padding(2);
             this.btnTransition.Name = "btnTransition";
             this.btnTransition.Size = new System.Drawing.Size(145, 56);
             this.btnTransition.TabIndex = 0;

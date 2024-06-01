@@ -10,7 +10,9 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
+using System.Threading;
 
 namespace Room_Escape_by_VISIONARIES
 {
@@ -24,15 +26,17 @@ namespace Room_Escape_by_VISIONARIES
 
         //Level 2 Backgrounds
         Bitmap backbuffer3;
-        Bitmap backbuffer33;
         Bitmap backbuffer4;
         Bitmap backbuffer5;
         Bitmap backbuffer6;
-        //Level 3 Backgrounds
         Bitmap backbuffer7;
+
+        //Level 3 Backgrounds
         Bitmap backbuffer8;
         Bitmap backbuffer9;
         Bitmap backbuffer10;
+        Bitmap backbuffer11;
+        Bitmap backbuffer12;
 
         Bitmap currentBackground;                    //When painting different backgrounds and make specific items to appear on a specific backbuffer
        
@@ -40,61 +44,49 @@ namespace Room_Escape_by_VISIONARIES
         Bitmap sprite;                               //Warden
         Bitmap sprite2;                              //Emma
         Bitmap sprite3;                              //Riddler
+
+
+        Label npcTitle;                              //Name tag for each NPC
+        Label RoomName;                              //Room name 
+
         int characSize = 600;
-        Rectangle rectDest;
-        Rectangle rectSource, rectD, rect0;
-        PictureBox clickSprite;
+        Rectangle rectDest, rectD, rect0;
+        PictureBox clickSprite;                      //A transparent picBox that will be overlaped over NPC for click interaction
 
 
         //Dialogue Size and property
-        int dialogueWidth = 900;                
-        int dialogueHeight = 220;
         Label DialogueBox;
-        List<string> currentDialogueLine;   //List to store many dialogue lines in sequence
-        int currentDialogueIndex;           //To track dialogue and display
-
-
-        Label npcTitle;
-
-
-        //Cliackable item as picbox
-        public PictureBox Beds;
-        public PictureBox faucets;
-        PictureBox LightBulb;
-        PictureBox Mirror;
-        public PictureBox Towel;
-        PictureBox Cup;
-        PictureBox ExitPortal;
-        PictureBox CellDoor;
-        public PictureBox Cabinet;
-
-        //Level2
-        PictureBox ElectricLock;
-        PictureBox Vent;
-        ListBox RiddleBox;
-        string phrase;
-        string NewPhrase;
-        TextBox LockBox;
-
+        List<string> currentDialogueLine;            //List to store dialogues if there are multiple lines in sequence
+        int currentDialogueIndex;                    //To track dialogue sequences
 
         //Item Box
         ListBox ItemBox;
-        int itemWidth = 450;
-        int itemHeight = 100;
         int faucetPiece = 0;
 
+        //Cliackable item as picbox
+        public PictureBox clickableItem;
+        public PictureBox Cabinet;
+
+        //Level2
+        PictureBox Vent;
+        ListBox RiddleBox;
+        TextBox LockBox;
+
         //BOOLS
-        bool cup;
-        bool levelOneKey = false;
-        bool cupFilledWater = false;
         bool cellDoorUnlock = false;
-        bool hideSprite = false;               //Bool for hiding/showing sprite NPC
+        bool hideSprite = false;                            //Bool for hiding/showing sprite NPC
+        bool OvenOpened = false;
+        bool StoveFixed = false;
 
         //Counters
-        int countBed = 0;                 
+        int countBed = 0;                                  //Used so dialogue for 1st time click and 2nd time click on item is diff
         int countCabinet = 0;
         int countTowel = 0;
-        int dialogueCount = 0;
+        int countEmma = 0;
+
+
+        //File Access
+        string filePath = Application.StartupPath + "\\Checklist.txt";
 
         public frmMain()
         {
@@ -109,10 +101,12 @@ namespace Room_Escape_by_VISIONARIES
             backbuffer3 = new Bitmap(frmG.picBack3.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             backbuffer4 = new Bitmap(frmG.picBack4.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             backbuffer5 = new Bitmap(frmG.picBack5.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer6 = new Bitmap(frmG.picBack6.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer7 = new Bitmap(frmG.picBack7.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             currentBackground = backbuffer1;                                          //Default background is backbuffer1. Later to be useful in Paint event for changing background
 
 
-            //Whenever Dialogue needed, call Dialogue Procedure and write apropriate text. Must call the click event to make sure it is removed after!
+            //Whenever Dialogue needed, call Dialogue Procedure and write apropriate text.
             currentDialogueLine = new List<string>();
             currentDialogueIndex = 0;         
             Dialogue();
@@ -121,19 +115,22 @@ namespace Room_Escape_by_VISIONARIES
             //Item Box
             Items();
             ItemBox.Items.Add("ITEM BOX");
+            ItemBox.SelectedIndexChanged += ItemBox_ItemClicked;                  //Event when an item is clicked from the listBox
+
+            //Room Name
+            Room_Name();
+            RoomName.Text = "Cell Door";
 
             //Arrow location
             int arrowX = Screen.PrimaryScreen.Bounds.Width - 110;
             int arrowY = Screen.PrimaryScreen.Bounds.Height - 150;
             int arrowXL = Screen.PrimaryScreen.Bounds.Width - 1280; //1380 for school comp
-            picArrowR.Location = new Point(arrowX, arrowY);                                       //Location for arrow Right
             picArrowL.Location = new Point(arrowXL, arrowY);                                      //Location for arrow Left
+            picArrowR.Location = new Point(arrowX, arrowY);                                       //Location for arrow Right
 
             // Warden sprite location in background 2
-            int spriteX = Screen.PrimaryScreen.Bounds.Width - characSize;
-            int spriteY = Screen.PrimaryScreen.Bounds.Height - 650;
             sprite = new Bitmap(frmG.picSprite.Image, characSize, characSize);
-            rectDest = new Rectangle(spriteX, spriteY, characSize, characSize);
+            rectDest = new Rectangle(830, 250, characSize, characSize);
 
             //Emma NPC
             sprite2 = new Bitmap(frmG.picEmma.Image, characSize, characSize);
@@ -147,12 +144,12 @@ namespace Room_Escape_by_VISIONARIES
         {
             //Create a new Label for Dialogue Box
             DialogueBox = new Label();
-            DialogueBox.Width = dialogueWidth;
-            DialogueBox.Height = dialogueHeight;
-            DialogueBox.Location = new Point(280, 600);
-            //DialogueBox.Location = new Point(280, 400);
+            DialogueBox.Width = 900;
+            DialogueBox.Height = 200;
+           // DialogueBox.Location = new Point(280, 600);
+            DialogueBox.Location = new Point(280, 400);
             DialogueBox.BackColor = Color.FromArgb(200, Color.Black);              //fromArgb refers to transparency
-            DialogueBox.ForeColor = Color.White;
+            DialogueBox.ForeColor = Color.Beige;
             DialogueBox.Font = new Font("Courier New", 14, FontStyle.Regular);
             DialogueBox.BorderStyle = BorderStyle.FixedSingle;
             DialogueBox.TextAlign = ContentAlignment.MiddleCenter;
@@ -163,33 +160,21 @@ namespace Room_Escape_by_VISIONARIES
 
         private void DialogueBox_Click(object sender, EventArgs e)                 //When user click dialogue box,
         {
-            Controls.Remove(npcTitle);
-            ShowNextLine();
-            
+           // Controls.Remove(npcTitle);
+            ShowNextLine();                                                        //If there is a next line
         }
         private void ShowNextLine()            
         {
-           if(currentDialogueIndex < currentDialogueLine.Count)                 //As long as current index is smaller than the amount of dialogue prepared
+           if(currentDialogueIndex < currentDialogueLine.Count)                  //As long as current index is smaller than the amount of dialogue prepared
             {
-                DialogueBox.Text = currentDialogueLine[currentDialogueIndex];   //Display dialogue line in certain index
-                currentDialogueIndex++;                                         //Increases so dialogue doesn't repeat same line
+                DialogueBox.Text = currentDialogueLine[currentDialogueIndex];    //Display dialogue line in certain index
+                currentDialogueIndex++;                                          //Increases so it move on to next line
             }
-           else                                                                 //If it's just one sentence then just remove the dialogue box in a click
+           else                                                               
             {
+                Controls.Remove(DialogueBox);                                    //If there is only a line to diplay dialogue disappears in a click
                 Controls.Remove(npcTitle);
-                Controls.Remove(DialogueBox);
             }
-        }
-        //Since Bitmap don't have click event, put a transparent picbox on top of bitmap so user can click it for interaction
-        private void wardenClick()
-        {
-            clickSprite = new PictureBox();
-            clickSprite.Width = 150;
-            clickSprite.Height = 500;
-            clickSprite.Location = new Point(1050, 300);
-            clickSprite.BackColor = Color.Transparent;               //This allows picbox to be transparent
-            clickSprite.Click += warden_Click;                  //Can interact with NPC through a click event
-            Controls.Add(clickSprite);
         }
 
         //Name tag on NPC
@@ -207,40 +192,79 @@ namespace Room_Escape_by_VISIONARIES
             npcTitle.BringToFront();
         }
 
+        private void Room_Name()
+        {
+            RoomName = new Label();
+            RoomName.Width = 150;
+            RoomName.Height = 40;
+            RoomName.Location = new Point(1250, 20);
+            RoomName.BackColor = Color.FromArgb(128, Color.Black);
+            RoomName.ForeColor = Color.Beige;
+            RoomName.Font = new Font("Courier New", 12, FontStyle.Regular);
+            RoomName.TextAlign = ContentAlignment.MiddleCenter;
+            Controls.Add(RoomName);
+            RoomName.BringToFront();
+        }
+
+        //User Item Box
+        private void Items()
+        {
+            ItemBox = new ListBox();
+            ItemBox.Width = 200;
+            ItemBox.Height = 150;
+            ItemBox.Location = new Point(80, 20);
+            ItemBox.BackColor = Color.Black;
+            ItemBox.ForeColor = Color.Beige;
+            ItemBox.Font = new Font("Courier New", 12, FontStyle.Regular);
+            ItemBox.BorderStyle = BorderStyle.FixedSingle;
+            Controls.Add(ItemBox);
+        }
+
+        //Since Bitmap don't have click event, put a transparent picbox on top of bitmap so user can click it for interaction
+        private void wardenClick()
+        {
+            clickSprite = new PictureBox();
+            clickSprite.Width = 150;
+            clickSprite.Height = 500;
+            clickSprite.Location = new Point(1050, 300);
+            clickSprite.BackColor = Color.Transparent;               //This allows picbox to be transparent
+            clickSprite.Click += warden_Click;                       //Can interact with NPC through a click event
+            Controls.Add(clickSprite);
+        }
+
         //When NPC warden is clicked
         private void warden_Click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);                            //Remove any previous dialogue before opening new dialogue
-            if (cupFilledWater == false)                             //If user don't posses an item called cup filled with water
+            Controls.Remove(DialogueBox);                           //Remove any previous dialogue before opening new dialogue
+            if (!ItemBox.Items.Contains("Cup with water"))          //If user don't posses an item called cup with water
             {
                 Dialogue();
                 NpcTitle();
                 npcTitle.Text = "Officer French"; ;
                 DialogueBox.Text = "What are you looking at? Go back to your cell. \n God, this place is so dirty, I want to get out of here right now!";                              
             }
-            else if (cupFilledWater == true && levelOneKey == false)                         //If user posses cup filled with water
+            else if (ItemBox.Items.Contains("Cup with water") && !ItemBox.Items.Contains("Master Key"))      //If user posses cup with water + !ItemBox.Items.Contains("Master Key") is to prevent from obtaining 2 items
             {
                 currentDialogueLine = new List<string>
                 {
                     "What have you done! You spilled water on me.\nNow I have to go change my clothes.",   //index = 0;
-                    "*Leaves room and drops key*",                                 
-                    "You obtained the MASTER KEY"
+                    "*Leaves room and drops key*",                                                         //index = 1;
+                    "You obtained the MASTER KEY"                                                          //index = 2;
                 };
                 currentDialogueIndex = 0;
                 NpcTitle();
                 npcTitle.Text = "Officer French";
                 Dialogue();
                 ShowNextLine();
-
-                levelOneKey = true;                                  //Posses Key to escape level 1
-                ItemBox.Items.Remove("Cup filled with water");       //Remove item after it is USED
-                ItemBox.Items.Add("Master Key");                     //Obtain different item 
+                          
+                ItemBox.Items.Remove("Cup with water");              //Remove item after USED
+                ItemBox.Items.Add("Master Key");                     //Posses Key to escape level 1
                 hideSprite = true;                                   //Refer frmPaint event. program paints sprite ONLY hidesprite == false. When hidesprite == true it won't draw the sprite.
                 Invalidate();                                        //Always repaint after paint event!
             }
         }
 
-
+        //Npc (Locked image version)
         private void picEmmaLocked()
         {
             clickSprite = new PictureBox();
@@ -256,12 +280,12 @@ namespace Room_Escape_by_VISIONARIES
         //When NPC image is clicked
         private void EmmaLocked_Click (object sender, EventArgs e)
         {
-          
             currentDialogueLine = new List<string>
             {
                "Hey! Please don't leave yet!",
                "I've been stuck here for too long! \n I'll help you escape if you let me come with you.\n I have the item you need to escape this floor.",
-               "So...Could you maybe...Unlock my cell? \n The lock is on the side and you'll need a password."
+               "So...Could you...Unlock my cell? \n The lock is on the side and you'll need a password."
+
             };
             currentDialogueIndex = 0;
             NpcTitle();
@@ -270,46 +294,34 @@ namespace Room_Escape_by_VISIONARIES
             ShowNextLine();
         }
 
-        //User Item Box
-        private void Items()
-        {
-            ItemBox = new ListBox();
-            ItemBox.Width = itemWidth;
-            ItemBox.Height = itemHeight;
-            ItemBox.Location = new Point(100, 50);
-            ItemBox.BackColor = Color.Black;
-            ItemBox.ForeColor = Color.White;
-            ItemBox.Font = new Font("Courier New", 12, FontStyle.Regular);
-            ItemBox.BorderStyle = BorderStyle.FixedSingle;
-            Controls.Add(ItemBox);
-        }
+       
 
         //CLICKABLE ITEMS
         public void picBeds()
         {
-            Beds = new PictureBox();
-            Beds.Width = 560;
-            Beds.Height = 390;
-            Beds.Location = new Point(65, 390);
-            Beds.Click += beds_click;                                             //Interaction when Bed is clicked
-            Beds.BackColor = Color.Transparent;                                   //Make it transparent so when user click bed they are actually clicking this picbox
-            Controls.Add(Beds);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 560;
+            clickableItem.Height = 390;
+            clickableItem.Location = new Point(65, 390);
+            clickableItem.Click += beds_click;                                             //Interaction when Bed is clicked
+            clickableItem.BackColor = Color.Transparent;                                   //Make it transparent so when user click bed they are actually clicking this picbox
+            Controls.Add(clickableItem);
         }
 
         public void beds_click(object sender, EventArgs e)                        //Click Event. When user click picpeds dialogue box appear
         {
-            Controls.Remove(DialogueBox);
+            Controls.Remove(DialogueBox);                                         //Remove any previously opened dialogue
 
             if (countBed == 0)
             {
                 Dialogue();
                 DialogueBox.Text = "Found a piece of faucet from the beds.";
-                ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");                //Remove ANY previous faucet line so we don't have unecessary repeatings but instead merge texts together
+                ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");           //Remove ANY previous faucet line so we don't have unecessary repeatings but instead merge texts together
                 faucetPiece++;
                 ItemBox.Items.Add($"Faucet Piece {faucetPiece}/3");
-                countBed++;
+                countBed++;                                                      //Help program recognize first/second time clicking an item
             }
-            else if (countBed > 0)                                                       //When it's second time clicking picBeds (After they obtained faucets)
+            else if (countBed > 0)                                               //When it's second time clicking picBeds (After they obtained faucets)
             {
                 Dialogue();
                 DialogueBox.Text = "No time to sleep. It's time to escape.";
@@ -318,13 +330,13 @@ namespace Room_Escape_by_VISIONARIES
 
         public void picCabinet()                                                    //Repeat same procedure as picBeds
         {
-            Cabinet = new PictureBox();
-            Cabinet.Width = 172;
-            Cabinet.Height = 170;
-            Cabinet.Location = new Point(773, 280);
-            Cabinet.BackColor = Color.Transparent;
-            Cabinet.Click += Cabinet_Click;
-            Controls.Add(Cabinet);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 172;
+            clickableItem.Height = 170;
+            clickableItem.Location = new Point(773, 280);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Cabinet_Click;
+            Controls.Add(clickableItem);
         }
 
         public void Cabinet_Click(object sender, EventArgs e)
@@ -333,13 +345,12 @@ namespace Room_Escape_by_VISIONARIES
 
             if (countCabinet == 0)
             {
-                Controls.Remove(DialogueBox);
                 Dialogue();
                 DialogueBox.Text = "You found a piece of faucet from the cabinet.";
                 ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");
                 faucetPiece++;
                 ItemBox.Items.Add($"Faucet Piece {faucetPiece}/3");
-                countCabinet++;
+                countCabinet++;                   
             }
             else if (countCabinet > 0)
             {
@@ -350,24 +361,25 @@ namespace Room_Escape_by_VISIONARIES
 
         private void picfaucets()
         {
-            faucets = new PictureBox();
-            faucets.Width = 200;
-            faucets.Height = 220;
-            faucets.Location = new Point(1120, 470);
-            faucets.Click += faucets_click;
-            faucets.BackColor = Color.Transparent;
-            Controls.Add(faucets);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 200;
+            clickableItem.Height = 220;
+            clickableItem.Location = new Point(1120, 470);
+            clickableItem.Click += faucets_click;
+            clickableItem.BackColor = Color.Transparent;
+            Controls.Add(clickableItem);
         }
 
         private void faucets_click(object sender, EventArgs e)
         {
             Controls.Remove(DialogueBox);
-            if (faucetPiece < 3)                                 //If user hasn't gathered all faucet pieces
+
+            if (faucetPiece < 3)                                                 //If user hasn't gathered all faucet pieces
             {
                 Dialogue();
                 DialogueBox.Text = "The faucet is broken. \n You might need to find missing pieces to fix.";
             }
-            else if (faucetPiece == 3 && cup == false)          //If user has faucets pieces but NO cups to fill water
+            else if (faucetPiece == 3 && !ItemBox.Items.Contains("Cup"))          //If user has faucets pieces but NO cup
             {
                 Dialogue();
                 DialogueBox.Text = "Faucet fixed. You hear water drops...";
@@ -375,26 +387,25 @@ namespace Room_Escape_by_VISIONARIES
             }
             
             //When user gathered all 3 faucet pieces AND a cup, faucet will give cup filled water
-            if(faucetPiece == 3 && cup == true && cupFilledWater == false) //cupFilledWater == false is to prevent user from obtaining another cupFilledWater
+            if(faucetPiece == 3 && ItemBox.Items.Contains("Cup") && !ItemBox.Items.Contains("Cup with water")) //cupFilledWater == false is to prevent user from obtaining another cupFilledWater
             {
                 Dialogue();
                 DialogueBox.Text = "Cup is now filled with water.\n ...Maybe you could spill this on someone.";
-                cupFilledWater = true;                                     //Gain item
                 ItemBox.Items.Remove("Cup");
                 ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");
-                ItemBox.Items.Add("Cup filled with water");
+                ItemBox.Items.Add("Cup with water");
             }       
         }
 
         private void picLightBulb()
         {
-            LightBulb = new PictureBox();
-            LightBulb.Width = 140;
-            LightBulb.Height = 100;
-            LightBulb.Location = new Point(650, 20);
-            LightBulb.Click += LightBulb_click;
-            LightBulb.BackColor = Color.Transparent;
-            Controls.Add(LightBulb);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 140;
+            clickableItem.Height = 100;
+            clickableItem.Location = new Point(650, 20);
+            clickableItem.Click += LightBulb_click;
+            clickableItem.BackColor = Color.Transparent;
+            Controls.Add(clickableItem);
         }     
         private void LightBulb_click(object sender, EventArgs e)
         {
@@ -404,13 +415,13 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void picMirror()
         {
-            Mirror = new PictureBox();
-            Mirror.Width = 200;
-            Mirror.Height = 200;
-            Mirror.Location = new Point(1120, 270);
-            Mirror.Click += Mirror_click;
-            Mirror.BackColor = Color.Transparent;
-            Controls.Add(Mirror);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 200;
+            clickableItem.Height = 200;
+            clickableItem.Location = new Point(1120, 270);
+            clickableItem.Click += Mirror_click;
+            clickableItem.BackColor = Color.Transparent;
+            Controls.Add(clickableItem);
         }
         private void Mirror_click(object sender, EventArgs e)
         {
@@ -421,13 +432,13 @@ namespace Room_Escape_by_VISIONARIES
 
         private void picTowel()
         {
-            Towel = new PictureBox();
-            Towel.Width = 70;
-            Towel.Height = 100;
-            Towel.Location = new Point(770, 570);
-            Towel.Click += towel_click;
-            Towel.BackColor = Color.Transparent;
-            Controls.Add(Towel);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 70;
+            clickableItem.Height = 100;
+            clickableItem.Location = new Point(770, 570);
+            clickableItem.Click += towel_click;
+            clickableItem.BackColor = Color.Transparent;
+            Controls.Add(clickableItem);
         }
 
         private void towel_click(object sender, EventArgs e)
@@ -452,25 +463,24 @@ namespace Room_Escape_by_VISIONARIES
 
         private void picCup()
         {
-            Cup = new PictureBox();
-            Cup.Width = 70;
-            Cup.Height = 80;
-            Cup.Location = new Point(770, 470);
-            Cup.Click += cup_click;
-            Cup.BackColor = Color.Transparent;
-            Controls.Add(Cup);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 70;
+            clickableItem.Height = 80;
+            clickableItem.Location = new Point(770, 470);
+            clickableItem.Click += cup_click;
+            clickableItem.BackColor = Color.Transparent;
+            Controls.Add(clickableItem);
         }
         private void cup_click(object sender, EventArgs e)
         {
             Controls.Remove(DialogueBox);
-            if (cup == false)                              //When user doesn't posses a cup, give cup
+            if (!ItemBox.Items.Contains("Cup"))                              //When user doesn't posses a cup, give cup
             {
                 Dialogue();
                 DialogueBox.Text = "You obtained a cup!";
                 ItemBox.Items.Add("Cup");
-                cup = true;
             }
-            else if (cup == true)                         //Prevents user from obtaining another cup
+            else if (ItemBox.Items.Contains("Cup"))                         //Prevents user from obtaining another cup
             {
                 Dialogue();
                 DialogueBox.Text = "Nothing is on the drawer.";
@@ -479,44 +489,44 @@ namespace Room_Escape_by_VISIONARIES
 
         private void picExitPortal()
         {
-            ExitPortal = new PictureBox();
-            ExitPortal.Width = 60;
-            ExitPortal.Height = 70;
-            ExitPortal.Location = new Point(350, 295);
-            ExitPortal.BackColor = Color.Transparent;
-            ExitPortal.Click += ExitPortal_click;
-            Controls.Add(ExitPortal);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 60;
+            clickableItem.Height = 70;
+            clickableItem.Location = new Point(350, 295);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += ExitPortal_click;
+            Controls.Add(clickableItem);
         }
 
         private void ExitPortal_click(object sender, EventArgs e)
         {
             Controls.Remove(DialogueBox);
-            if (levelOneKey == false)                            //When user doesn't posses a key item
+            if (!ItemBox.Items.Contains("Master Key"))                            //When user doesn't posses a key item
             {
                 Dialogue();
                 DialogueBox.Text = "Need Key to insert.";
             }
-            else if (levelOneKey == true)                        //When user have key, unlocks door
+            else if (ItemBox.Items.Contains("Master Key"))                        //When user have key, unlocks door
             {
                 Dialogue();
                 DialogueBox.Text = "Cell Door Unlocked.";
-                cellDoorUnlock = true;
+                cellDoorUnlock = true;                                            //When this bool is true, clicking cellDoor will allow user move onto level 2
             }    
         }
 
         private void picCellDoor()
         {
-            CellDoor = new PictureBox();
-            CellDoor.Width = 470;
-            CellDoor.Height = 740;
-            CellDoor.Location = new Point(520, 50);
-            CellDoor.BackColor = Color.Transparent;
-            CellDoor.Click += CellDoor_click;
-            Controls.Add(CellDoor);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 470;
+            clickableItem.Height = 740;
+            clickableItem.Location = new Point(520, 50);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += CellDoor_click;
+            Controls.Add(clickableItem);
         }
         private void CellDoor_click(object sender, EventArgs e)
         {
-            //Controls.Remove(DialogueBox);
+            Controls.Remove(DialogueBox);
             //if (cellDoorUnlock == false)
             //{
             //    Dialogue();
@@ -524,13 +534,13 @@ namespace Room_Escape_by_VISIONARIES
             //}
             //else if (cellDoorUnlock == true)
             //{
-            //    currentBackground = backbuffer3;
-            //    Invalidate();
-            //    background_Change();
+            //    ItemBox.Items.Remove("Master Key");
+            //    currentBackground = backbuffer3;                 //Change background to level 2
+            //    Invalidate();                                    //Always Invalidate when changing backgrounds
+            //    background_Change();                             //To call items that are in level 2 room 1
             //}
 
             //Quick Route to level 2
-            Controls.Remove(DialogueBox);
             if (cellDoorUnlock == true)
             {
                 Dialogue();
@@ -538,31 +548,61 @@ namespace Room_Escape_by_VISIONARIES
             }
             else if (cellDoorUnlock == false)
             {
+                ItemBox.Items.Remove("Master Key");
                 currentBackground = backbuffer3;
                 Invalidate();
                 background_Change();
             }
         }
 
+        //File Acces for level 2
+        private void fileAccess()
+        {
+            try
+            {
+                FileStream fs = new FileStream(filePath, FileMode.Open);
+                StreamReader myFile = new StreamReader(fs);
+                string fileContents = myFile.ReadToEnd();
+                MessageBox.Show(fileContents);
+                myFile.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);                                 //Recipe shows up
+            }
+        }
+        private void ItemBox_ItemClicked(object sender, EventArgs e)
+        {
+            if(ItemBox.SelectedItem != null && ItemBox.SelectedItem.ToString() == "Poutine Recipe")
+            {   // != null checks if item is selected from the listbox (null means there is no reference)
+                fileAccess();
+            }
+        }
+
         //Level 2 Clickable Item
         private void picElectricLock()
         {
-            ElectricLock = new PictureBox();
-            ElectricLock.Width = 100;
-            ElectricLock.Height = 95;
-            ElectricLock.Location = new Point(350, 305);
-            ElectricLock.BackColor = Color.Transparent;
-            ElectricLock.Click += ElectricLock_click;
-            Controls.Add(ElectricLock);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 100;
+            clickableItem.Height = 95;
+            clickableItem.Location = new Point(350, 305);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += ElectricLock_click;
+            Controls.Add(clickableItem);
         }
         private void ElectricLock_click(object sender, EventArgs e)
         {
-            picArrowL.Enabled = false;
+            Controls.Remove(DialogueBox);
+            picArrowL.Enabled = false;                               //Until they enter something none of them are enabled
             picArrowR.Enabled = false;
-            Vent.Enabled = false;
+            clickableItem.Enabled = false;
             clickSprite.Enabled = false;
-            Riddle();
-            Lock();
+
+            Riddle();                                                //Question Box
+            RiddleBox.Items.Add("             12 x 12 = 9");
+            RiddleBox.Items.Add("             23 x 23 = 16");
+            RiddleBox.Items.Add("             34 x 34? = ?");
+            Lock();                                                  //txtBox for user input
             
         }
         private void Riddle()
@@ -574,8 +614,7 @@ namespace Room_Escape_by_VISIONARIES
             RiddleBox.BackColor = Color.Black;
             RiddleBox.ForeColor = Color.YellowGreen;
             RiddleBox.Font = new Font("Century", 15, FontStyle.Regular);
-            RiddleBox.BorderStyle = BorderStyle.FixedSingle;
-            RiddleBox.Items.Add("          If I stab someone else, I die. What am I?");
+            RiddleBox.BorderStyle = BorderStyle.FixedSingle;    
             Controls.Add(RiddleBox);
             RiddleBox.BringToFront();
         }
@@ -585,88 +624,555 @@ namespace Room_Escape_by_VISIONARIES
             LockBox = new TextBox();
             LockBox.Width = 500;
             LockBox.Height = 400;
-           // LockBox.Location = new Point(555, 505);
-            LockBox.Location = new Point(540, 675);
+            LockBox.Location = new Point(555, 505);
+          //  LockBox.Location = new Point(540, 675);
             LockBox.BackColor = Color.Black;
             LockBox.ForeColor = Color.YellowGreen;
             LockBox.Font = new Font("Seif", 12, FontStyle.Regular);
             LockBox.BorderStyle = BorderStyle.FixedSingle;
             LockBox.Text = "";
-
             Controls.Add(LockBox);
-            LockBox.KeyDown += answer_enter;
+            LockBox.KeyDown += answer_enter;                       //Calls enter key event
             LockBox.BringToFront();
 
         }
         private void answer_enter(object sender, KeyEventArgs e)
         {
-            phrase = LockBox.Text;
-            NewPhrase = phrase.Replace("b", "B");
+            int answer;                                            //User Input
 
-            if (e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)                           //Checks answer from pressing enter
             {
-                Controls.Remove(LockBox);
+                Controls.Remove(LockBox);                          //Question and answer box gone after typing ans
                 Controls.Remove(RiddleBox);
 
-                if (NewPhrase == "Bee" || NewPhrase == "A bee")
+                if (currentBackground == backbuffer3)              //For unlocking Emma Gibbs NPC
                 {
-                    Dialogue();
-                    DialogueBox.Text = "Correct.";
-                    currentBackground = backbuffer4;
-                    picArrowL.Enabled = true;
-                    picArrowR.Enabled = true;
-                    ItemBox.Items.Add("Master Key");             //Gets removed after changing to new background so re-add
-                    background_Change();
-
+                    if (int.TryParse(LockBox.Text, out answer))
+                    {
+                        if (answer == 13)
+                        {
+                            Dialogue();
+                            DialogueBox.Text = "Correct.";
+                            picArrowL.Enabled = true;                  //Enable arrow buttons after
+                            picArrowR.Enabled = true;
+                            currentBackground = backbuffer4;
+                            background_Change();                       //Change to the background where npc is now freed
+                        }
+                        else
+                        {
+                            Dialogue();
+                            DialogueBox.Text = "Incorrect, try again.";
+                        }
+                    }
+                    else
+                    {
+                        Dialogue();
+                        DialogueBox.Text = "Incorrect, try again.";
+                    }
                 }
-                else
+                else if (currentBackground == backbuffer5)                //For opening oven
                 {
-                    Dialogue();
-                    DialogueBox.Text = "Incorrect, try again.";
+                    if (int.TryParse(LockBox.Text, out answer))
+                    {
+                        if (answer == 23045)
+                        {
+                            Dialogue();
+                            DialogueBox.Text = "Oven is open now.";
+                            OvenOpened = true;
+                        }
+                        else
+                        {
+                            Dialogue();
+                            DialogueBox.Text = "Incorrect, try again.";
+                        }
+                    }
+                    else
+                    {
+                        Dialogue();
+                        DialogueBox.Text = "Incorrect, try again.";
+                    }
                 }
             }
         }
 
-
         private void picVent()
         {
-            Vent = new PictureBox();
-            Vent.Width = 195;
-            Vent.Height = 110;
-            Vent.Location = new Point(265, 540);
-            Vent.BackColor = Color.Transparent;
-            Vent.Click += Vent_click;
-            Controls.Add(Vent);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 195;
+            clickableItem.Height = 110;
+            clickableItem.Location = new Point(265, 540);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Vent_click;
+            Controls.Add(clickableItem);
         }
         private void Vent_click(object sender, EventArgs e)
         {
+            Controls.Remove(DialogueBox);
             Dialogue();
-            DialogueBox.Text = "You found a scribble written on vent \n Hint: Insect";
+            DialogueBox.Text = "You found a scribble written on the vent \n Hint: If C + D = ABC, \n then A + B + C = answer ";
+            //34 x 34 = 1156, 1 + 1 + 5 + 6 = 13
         }
 
         private void picEmma()
         {
-            clickSprite = new PictureBox();
-            clickSprite.Width = 170;
-            clickSprite.Height = 500;
-            clickSprite.Location = new Point(1050, 290);
-            clickSprite.BackColor = Color.Transparent;
-            clickSprite.Click += picEmma_click;
-            Controls.Add(clickSprite);
+            clickableItem = new PictureBox();
+            clickableItem.Width = 170;
+            clickableItem.Height = 500;
+            clickableItem.Location = new Point(1050, 290);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += picEmma_click;
+            Controls.Add(clickableItem);
         }
         private void picEmma_click(object sender, EventArgs e)
         {
-            currentDialogueLine = new List<string>
+            if(!ItemBox.Items.Contains("Poutine"))                     //if User didn't completed npc's quest yet
+            {
+                currentDialogueLine = new List<string>
                 {
                     "Thank you for saving me! You won't regret this.",
-                    "Oh the item? Um, I am too hungry to talk about that right now \n so... Maybe you can bring me food first?",
-                    "My favorite food is poutine, not that I want you to make \n poutine but if you want your item..."
+                    "Oh the item? I'm too hungry to talk about that \n right now. Bring me food first?",
+                    "My favorite food is poutine.\n Make me one if you want your item..."
                 };
-            currentDialogueIndex = 0;
-            NpcTitle();
-            npcTitle.Text = "Emma Gibbs";
+                currentDialogueIndex = 0;
+                NpcTitle();
+                npcTitle.Text = "Emma Gibbs";
+                Dialogue();
+                ShowNextLine();
+
+                if (countEmma == 0)                                   //Prevent user form optaining another same item
+                {
+                    ItemBox.Items.Add("Poutine Recipe");
+                    countEmma++;
+                }
+
+            } 
+            else if (ItemBox.Items.Contains("Poutine"))               //After they completed the quest
+            {
+                if(!ItemBox.Items.Contains("Spoon"))
+                {
+                    currentDialogueLine = new List<string>
+                    {
+                    "Um...This poutine taste amazing!",
+                    "Here I'll give you a SPOON. \n You can use this to dig through something...",
+                    };
+                    currentDialogueIndex = 0;
+                    NpcTitle();
+                    npcTitle.Text = "Emma Gibbs";
+                    Dialogue();
+                    ShowNextLine();
+                    ItemBox.Items.Add("Spoon");
+                }
+                else if (ItemBox.Items.Contains("Spoon"))
+                {
+                    Dialogue();
+                    DialogueBox.Text = "One of the room here has a route to the next floor. \n You can use the spoon to use the route.";
+                } 
+            }
+        }
+
+
+        private void picOven()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 615;
+            clickableItem.Height = 298;
+            clickableItem.Location = new Point(560, 90);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Oven_click;
+            Controls.Add(clickableItem);
+        }
+        private void Oven_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            Controls.Remove(LockBox);                                   // if user clicks oven multiple times, this prevents question appearing more than once     
+            Controls.Remove(RiddleBox);
+
+            if (OvenOpened == false)
+            {
+                Riddle();
+                RiddleBox.Items.Add("             Pleas enter password to use the oven.");
+                Lock();
+
+            } else if(OvenOpened == true && !ItemBox.Items.Contains("Frozen Cheese"))                 //If oven is fixed but user doesn't have cheese
+            {
+                Dialogue();
+                DialogueBox.Text = "You have nothing to unfreeze.";
+            }
+             else if (OvenOpened == true && ItemBox.Items.Contains("Frozen Cheese"))                 //If oven is fixed and user have cheese
+            {
+                ItemBox.Items.Remove("Frozen Cheese");
+                ItemBox.Items.Add("Cheese");
+                Dialogue();
+                DialogueBox.Text = "You have unfrozed the cheese.";
+            } 
+        }
+
+        private void picKnife()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 40;
+            clickableItem.Height = 90;
+            clickableItem.Location = new Point(395, 150);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Knife_click;
+            Controls.Add(clickableItem);
+        }
+        private void Knife_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Knife"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You obtained a knife.";
+                ItemBox.Items.Add("Knife");
+            }
+            else if (ItemBox.Items.Contains("Knife"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You already obtained a knife.";
+            }  
+
+        }
+        private void picPan()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 70;
+            clickableItem.Height = 130;
+            clickableItem.Location = new Point(1220, 210);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Pan_click;
+            Controls.Add(clickableItem);
+        }
+        private void Pan_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Pan"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You obtained a pan.";
+                ItemBox.Items.Add("Pan");
+            }
+            else if (ItemBox.Items.Contains("Pan"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You see nothing to collect.";
+            }
+          
+        }
+        private void picPlate()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 90;
+            clickableItem.Height = 90;
+            clickableItem.Location = new Point(160, 380);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Plate_click;
+            Controls.Add(clickableItem);
+        }
+        private void Plate_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
             Dialogue();
-            ShowNextLine();
+            DialogueBox.Text = "A clean plate.";
+        }
+
+        private void picCupBoard()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 90;
+            clickableItem.Height = 150;
+           // clickableItem.Location = new Point(1250, 800)
+            clickableItem.Location = new Point(1050, 500);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += cupBoard_click;
+            Controls.Add(clickableItem);
+        }
+
+        private void cupBoard_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Gravy Sauce"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You obtained Gravy Sauce";
+                ItemBox.Items.Add("Gravy Sauce");
+            }
+            else if (ItemBox.Items.Contains("Gravy Sauce"))
+            {
+                Dialogue();
+                DialogueBox.Text = "Cupboard is empty.";
+            }
+        }
+
+
+        private void picStove()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 600;
+            clickableItem.Height = 80;
+            clickableItem.Location = new Point(720, 400);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Stove_click;
+            Controls.Add(clickableItem);
+        }
+        private void Stove_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if(StoveFixed == false)
+            {
+                Dialogue();
+                DialogueBox.Text = "The stove is broken. Must fix to make poutine.";
+                //Another spot the difference game
+            }
+        }
+        private void picCuttingBoard()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 190;
+            clickableItem.Height = 80;
+            clickableItem.Location = new Point(400, 450);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += cuttingBoard_click;
+            Controls.Add(clickableItem);
+        }
+        private void cuttingBoard_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+
+            if (ItemBox.Items.Contains("Potato") && ItemBox.Items.Contains("Canola Oil") && ItemBox.Items.Contains("Gravy Sauce") &&                   //If all materials are collected
+               ItemBox.Items.Contains("Pan") && ItemBox.Items.Contains("Knife") && ItemBox.Items.Contains("Cheese") /*&& StoveFixed == true*/)
+            {
+                //Mini game opens
+                //Pearlly Molly and Emma to work on it
+                ItemBox.Items.Remove("Potato");
+                ItemBox.Items.Remove("Canola Oil");
+                ItemBox.Items.Remove("Gravy Sauce");
+                ItemBox.Items.Remove("Pan");
+                ItemBox.Items.Remove("Knife");
+                ItemBox.Items.Remove("Cheese");
+                ItemBox.Items.Add("Poutine");
+
+                Dialogue();
+                DialogueBox.Text = "You have successfully cooked a poutine!";
+            }
+            else
+            {
+                Dialogue();
+                DialogueBox.Text = "A cutting board. You don't have all the items yet.";
+            }
+        }
+
+        private void picPotato()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 210;
+            clickableItem.Height = 90;
+            clickableItem.Location = new Point(50, 260);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += potato_click;
+            Controls.Add(clickableItem);
+        }
+        private void potato_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Potato"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You obtained potato.";
+                ItemBox.Items.Add("Potato");
+            }
+            else if(ItemBox.Items.Contains("Potato"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You don't need more potato.";
+            }
+        }
+
+        private void picTomato()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 95;
+            clickableItem.Height = 85;
+            clickableItem.Location = new Point(125, 465);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += tomato_click;
+            Controls.Add(clickableItem);
+        }
+        private void tomato_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Tomato"))
+            {
+                Dialogue();
+                DialogueBox.Text = "A box of tomato. Mouse might like it.";
+                ItemBox.Items.Add("Tomato");
+            }
+            else if (ItemBox.Items.Contains("Tomato"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You don't have enough room for more tomato.";
+            }     
+        }
+
+        private void picOil()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 125;
+            clickableItem.Height = 205;
+            clickableItem.Location = new Point(915, 540);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += oil_click;
+            Controls.Add(clickableItem);
+        }
+        private void oil_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Canola Oil"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You looked inside the barrel and find Canola oil.";
+                ItemBox.Items.Add("Canola Oil");
+            }
+            else if(ItemBox.Items.Contains("Canola Oil"))
+            {
+                Dialogue();
+                DialogueBox.Text = "The barrel is now empty.";
+            }   
+        }
+
+
+        private void picMouse()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 60;
+            clickableItem.Height = 50;
+            // clickableItem.Location = new Point(1250, 740);
+            clickableItem.Location = new Point(1050, 540);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += mouse_click;
+            Controls.Add(clickableItem);
+        }
+        private void mouse_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Tomato"))
+            {
+                Dialogue();
+                DialogueBox.Text = "The mouse looks very hungry. \n Maybe you could offer something.";
+            }
+            else if (ItemBox.Items.Contains("Tomato") && !ItemBox.Items.Contains("Frozen Cheese"))
+            {
+                Dialogue();
+                DialogueBox.Text = "The mouse eats the tomato. To repay your kindness,\n he gives you frozen cheese.";
+                ItemBox.Items.Remove("Tomato");
+                ItemBox.Items.Add("Frozen Cheese");
+            }    
+        }
+
+
+        private void picShowerHead()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 175;
+            clickableItem.Height = 120;
+            clickableItem.Location = new Point(630, 35);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += showerHead_click;
+            Controls.Add(clickableItem);
+        }
+        private void picShowerHead2()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 175;
+            clickableItem.Height = 120;
+            clickableItem.Location = new Point(1100, 35);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += showerHead_click;
+            Controls.Add(clickableItem);
+        }
+        private void showerHead_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            Dialogue();
+            DialogueBox.Text = "A shower Head.";
+        }
+
+        private void picHugeMirror()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 1130;
+            clickableItem.Height = 235;
+            clickableItem.Location = new Point(120, 200);
+            clickableItem.BackColor = Color.Transparent ;
+            clickableItem.Click += hugeMirror_click;
+            Controls.Add(clickableItem);
+        }
+        private void hugeMirror_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            Dialogue();
+            DialogueBox.Text = "The mirror is covered with steam. Someone could write on it.";
+        }
+        private void picScribble()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 90;
+            clickableItem.Height = 30;
+            clickableItem.Location = new Point(1240, 400);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += scribble_click;
+            clickableItem.BringToFront();
+            Controls.Add(clickableItem);
+        }
+        private void scribble_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            Dialogue();
+            DialogueBox.Text = "23045";
+        }
+
+        private void picShampoo()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 80;
+            clickableItem.Height = 100;
+            clickableItem.Location = new Point(890, 380);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += shampoo_click;
+            clickableItem.BringToFront();
+            Controls.Add(clickableItem);
+        }
+        private void shampoo_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            Dialogue();
+            DialogueBox.Text = "A box of shampoo and conditionners";
+        }
+
+        private void picBrokenWall ()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 125;
+            clickableItem.Height = 250;
+            clickableItem.Location = new Point(1120, 500);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += brokenWall_click;
+            Controls.Add(clickableItem);
+        }
+        private void brokenWall_click(object sender, EventArgs e)
+        {
+            Controls.Remove(DialogueBox);
+            if (!ItemBox.Items.Contains("Spoon"))
+            {
+                Dialogue();
+                DialogueBox.Text = "The wall tile is broken. The inside walls looks soft \n almost you can dig through if you has an ITEM.";
+            }
+            else if (ItemBox.Items.Contains("Spoon"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You started digging the wall with spoon, on and on \n until you started feeling a mere presence of light.";
+                //Move on to level 3
+            }
         }
 
         private void frmMain_Paint(object sender, PaintEventArgs e)
@@ -699,15 +1205,28 @@ namespace Room_Escape_by_VISIONARIES
         }   
         private void picArrowL_Click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);                        //For better UX, if user move between rooms without removing dialogue yet it automatically does
-             if(currentBackground == backbuffer1)                          //For level 1, when cell door is still locked
+            Controls.Remove(DialogueBox);                         //For better UX, if user move between rooms without removing dialogue yet it automatically does
+            Controls.Remove(LockBox);                          
+            Controls.Remove(RiddleBox);
+
+            if (currentBackground == backbuffer1)                          //For level 1, when cell door is still locked
             {
                 currentBackground = backbuffer2;
                 background_Change();
             } 
             else if (currentBackground == backbuffer4)
             {
-                currentBackground = backbuffer5;
+                currentBackground = backbuffer5;                  //Go to Kitchen
+                background_Change();
+            }
+            else if (currentBackground == backbuffer5)
+            {
+                currentBackground = backbuffer7;                  //Go to Storage
+                background_Change();
+            }
+            else if (currentBackground == backbuffer6)
+            {
+                currentBackground = backbuffer4;                  //Return Back to cell Hallway from Shower Booth
                 background_Change();
             }
 
@@ -720,14 +1239,24 @@ namespace Room_Escape_by_VISIONARIES
             Controls.Remove(DialogueBox);
             if (currentBackground == backbuffer2)
             {
-                currentBackground = backbuffer1;
+                currentBackground = backbuffer1;              //Return to cell Door from BedRoom
                 background_Change();
             }
-            else if (currentBackground == backbuffer4)
+            else if(currentBackground == backbuffer4)
             {
-
+                currentBackground = backbuffer6;              //Return to Cell Hallway
+                background_Change();
             }
-
+            else if (currentBackground == backbuffer5)
+            {
+                currentBackground = backbuffer4;              //Changes to Shower Room
+                background_Change();
+            }
+            else if (currentBackground == backbuffer7)
+            {
+                currentBackground = backbuffer5;              //Return to Kitchen
+                background_Change();
+            }
         }
 
         private void background_Change()
@@ -739,12 +1268,16 @@ namespace Room_Escape_by_VISIONARIES
 
             if (currentBackground == backbuffer1)             //Items that goes along with background1
             {
+                Room_Name();
+                RoomName.Text = "Cell Door";
                 wardenClick();
                 picCellDoor();
                 picExitPortal();
             }
             else if (currentBackground == backbuffer2)        //Items that goes along with background2
             {
+                Room_Name();
+                RoomName.Text = "Bedroom";
                 picBeds();
                 picfaucets();
                 picLightBulb();
@@ -755,29 +1288,59 @@ namespace Room_Escape_by_VISIONARIES
             }
             else if (currentBackground == backbuffer3)
             {
+                Room_Name();
+                RoomName.Text = "Cell Corridor";
                 picElectricLock();
                 picVent();
                 picEmmaLocked();
             }
             else if (currentBackground == backbuffer4)
             {
+                Room_Name();
+                RoomName.Text = "Cell Corridor";
                 picEmma();
             }
             else if (currentBackground == backbuffer5)
             {
+                Room_Name();
+                RoomName.Text = "Kitchen";
+                picOven();
+                picKnife();
+                picPan();
+                picCupBoard();
+                picPlate();
+                picStove();
+                picCuttingBoard();
+            }
+            else if (currentBackground == backbuffer6)
+            {
+                Room_Name();
+                RoomName.Text = "Shower Room";
+                picHugeMirror();
+                picScribble();
+                picShampoo();
+                picBrokenWall();
+                picShowerHead();
+                picShowerHead2();
 
             }
-
+            else if (currentBackground == backbuffer7)
+            {
+                Room_Name();
+                RoomName.Text = "Storage";
+                picPotato();
+                picTomato();
+                picOil();
+                picMouse();
+            }
             Invalidate();                //Force the form to RE-DRAW
         }
     }
 }
 //Goals
-//How to make arrow count background and move between rooms
-//File Access. Emma will give a slip of paper and user can check what item they need for poutine 
+//Fix problem where you can click kitech item when riddle box is open
 //Remove arrowR for backbuffer 1 but make it appear as it goes to backbuffer2
-//Name tag problem AGAIN
 //Character idle (If time allows)
 //Home Display (start save and whatever)
-//Character face Card if time allows
+
 
