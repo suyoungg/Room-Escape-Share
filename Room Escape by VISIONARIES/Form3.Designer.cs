@@ -40,6 +40,10 @@
             this.picBack6 = new System.Windows.Forms.PictureBox();
             this.picBack7 = new System.Windows.Forms.PictureBox();
             this.picBack8 = new System.Windows.Forms.PictureBox();
+            this.picBack9 = new System.Windows.Forms.PictureBox();
+            this.picBack10 = new System.Windows.Forms.PictureBox();
+            this.picBack11 = new System.Windows.Forms.PictureBox();
+            this.picBack12 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.picBack1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picSprite)).BeginInit();
@@ -51,6 +55,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBack6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack8)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack9)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack11)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack12)).BeginInit();
             this.SuspendLayout();
             // 
             // picBack1
@@ -160,6 +168,7 @@
             // 
             // picBack8
             // 
+            this.picBack8.Image = ((System.Drawing.Image)(resources.GetObject("picBack8.Image")));
             this.picBack8.Location = new System.Drawing.Point(151, 124);
             this.picBack8.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.picBack8.Name = "picBack8";
@@ -168,11 +177,56 @@
             this.picBack8.TabIndex = 12;
             this.picBack8.TabStop = false;
             // 
+            // picBack9
+            // 
+            this.picBack9.Image = ((System.Drawing.Image)(resources.GetObject("picBack9.Image")));
+            this.picBack9.Location = new System.Drawing.Point(283, 124);
+            this.picBack9.Margin = new System.Windows.Forms.Padding(2);
+            this.picBack9.Name = "picBack9";
+            this.picBack9.Size = new System.Drawing.Size(112, 104);
+            this.picBack9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBack9.TabIndex = 13;
+            this.picBack9.TabStop = false;
+            // 
+            // picBack10
+            // 
+            this.picBack10.Location = new System.Drawing.Point(411, 124);
+            this.picBack10.Margin = new System.Windows.Forms.Padding(2);
+            this.picBack10.Name = "picBack10";
+            this.picBack10.Size = new System.Drawing.Size(112, 104);
+            this.picBack10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBack10.TabIndex = 14;
+            this.picBack10.TabStop = false;
+            // 
+            // picBack11
+            // 
+            this.picBack11.Location = new System.Drawing.Point(539, 124);
+            this.picBack11.Margin = new System.Windows.Forms.Padding(2);
+            this.picBack11.Name = "picBack11";
+            this.picBack11.Size = new System.Drawing.Size(112, 104);
+            this.picBack11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBack11.TabIndex = 15;
+            this.picBack11.TabStop = false;
+            // 
+            // picBack12
+            // 
+            this.picBack12.Location = new System.Drawing.Point(15, 241);
+            this.picBack12.Margin = new System.Windows.Forms.Padding(2);
+            this.picBack12.Name = "picBack12";
+            this.picBack12.Size = new System.Drawing.Size(112, 104);
+            this.picBack12.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBack12.TabIndex = 16;
+            this.picBack12.TabStop = false;
+            // 
             // frmStorage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.picBack12);
+            this.Controls.Add(this.picBack11);
+            this.Controls.Add(this.picBack10);
+            this.Controls.Add(this.picBack9);
             this.Controls.Add(this.picBack8);
             this.Controls.Add(this.picBack7);
             this.Controls.Add(this.picBack6);
@@ -198,6 +252,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBack6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack8)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack9)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack11)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBack12)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -215,5 +273,9 @@
         public System.Windows.Forms.PictureBox picBack6;
         public System.Windows.Forms.PictureBox picBack7;
         public System.Windows.Forms.PictureBox picBack8;
+        public System.Windows.Forms.PictureBox picBack9;
+        public System.Windows.Forms.PictureBox picBack10;
+        public System.Windows.Forms.PictureBox picBack11;
+        public System.Windows.Forms.PictureBox picBack12;
     }
 }

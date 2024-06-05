@@ -1,6 +1,6 @@
 ﻿namespace Room_Escape_by_VISIONARIES
 {
-    partial class Form4
+    partial class form5
     {
         /// <summary>
         /// Required designer variable.
@@ -28,20 +28,47 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.btnStart = new System.Windows.Forms.Button();
+            this.btnExit = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // Form4
+            // btnStart
+            // 
+            this.btnStart.Location = new System.Drawing.Point(447, 349);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(116, 78);
+            this.btnStart.TabIndex = 0;
+            this.btnStart.Text = "Start";
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
+            // btnExit
+            // 
+            this.btnExit.Location = new System.Drawing.Point(607, 349);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(146, 78);
+            this.btnExit.TabIndex = 1;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // form5
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Name = "Form4";
-            this.Text = "Form4";
-            this.Load += new System.EventHandler(this.Form4_Load);
+            this.Controls.Add(this.btnExit);
+            this.Controls.Add(this.btnStart);
+            this.Name = "form5";
+            this.Text = "Start Display";
+            this.Load += new System.EventHandler(this.form5_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Button btnStart;
+        private System.Windows.Forms.Button btnExit;
     }
 }
