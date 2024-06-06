@@ -14,6 +14,8 @@ using System.IO;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 using System.Threading;
 using System.Media;
+using static System.Windows.Forms.AxHost;
+using System.Security.Claims;
 
 namespace Room_Escape_by_VISIONARIES
 {
@@ -38,6 +40,7 @@ namespace Room_Escape_by_VISIONARIES
         Bitmap backbuffer10;
         Bitmap backbuffer11;
         Bitmap backbuffer12;
+        Bitmap backbuffer13;
 
         Bitmap currentBackground;                    //When painting different backgrounds and make specific items to appear on a specific backbuffer
        
@@ -115,6 +118,10 @@ namespace Room_Escape_by_VISIONARIES
             backbuffer7 = new Bitmap(frmG.picBack7.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             backbuffer8 = new Bitmap(frmG.picBack8.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             backbuffer9 = new Bitmap(frmG.picBack9.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer10 = new Bitmap(frmG.picBack10.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer11 = new Bitmap(frmG.picBack11.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer12 = new Bitmap(frmG.picBack12.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            backbuffer13 = new Bitmap(frmG.picBack13.Image, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
 
             currentBackground = backbuffer1;                                          //Default background is backbuffer1. Later to be useful in Paint event for changing background
 
@@ -286,7 +293,7 @@ namespace Room_Escape_by_VISIONARIES
             Controls.Remove(DialogueBox);                           //Remove any previous dialogue before opening new dialogue
             Controls.Remove(npcTitle);
 
-            if (!ItemBox.Items.Contains("Cup with water"))          //If user don't posses an item called cup with water
+            if (!ItemBox.Items.Contains("Cup with water") && !ItemBox.Items.Contains("Master Key"))          //If user don't posses an item called cup with water
             {
                 Dialogue();
                 NpcTitle();
@@ -607,6 +614,20 @@ namespace Room_Escape_by_VISIONARIES
             //}
 
             //Quick Route to level 3
+            //if (cellDoorUnlock == true)
+            //{
+            //    Dialogue();
+            //    DialogueBox.Text = "The cell door is locked.";
+            //}
+            //else if (cellDoorUnlock == false)
+            //{
+            //    ItemBox.Items.Remove("Master Key");
+            //    currentBackground = backbuffer9;
+            //    Invalidate();
+            //    background_Change();
+            //}
+
+            //Quick Route to CCTV ROOM
             if (cellDoorUnlock == true)
             {
                 Dialogue();
@@ -615,10 +636,38 @@ namespace Room_Escape_by_VISIONARIES
             else if (cellDoorUnlock == false)
             {
                 ItemBox.Items.Remove("Master Key");
-                currentBackground = backbuffer8;
+                currentBackground = backbuffer10;
                 Invalidate();
                 background_Change();
             }
+
+            //Quick Route to Clothing ROOM
+            //if (cellDoorUnlock == true)
+            //{
+            //    Dialogue();
+            //    DialogueBox.Text = "The cell door is locked.";
+            //}
+            //else if (cellDoorUnlock == false)
+            //{
+            //    ItemBox.Items.Remove("Master Key");
+            //    currentBackground = backbuffer13;
+            //    Invalidate();
+            //    background_Change();
+            //}
+
+            ////Quick Route to Staff room
+            //if (cellDoorUnlock == true)
+            //{
+            //    Dialogue();
+            //    DialogueBox.Text = "The cell door is locked.";
+            //}
+            //else if (cellDoorUnlock == false)
+            //{
+            //    ItemBox.Items.Remove("Master Key");
+            //    currentBackground = backbuffer13;
+            //    Invalidate();
+            //    background_Change();
+            //}
         }
 
         //File Acces for level 2
@@ -1287,7 +1336,7 @@ namespace Room_Escape_by_VISIONARIES
             clickableItem.Width = 125;
             clickableItem.Height = 250;
             clickableItem.Location = new Point(1120, 500);
-            clickableItem.BackColor = Color.Transparent;
+            clickableItem.BackColor = Color.Red;
             clickableItem.Click += brokenWall_click;
             Controls.Add(clickableItem);
         }
@@ -1350,18 +1399,34 @@ namespace Room_Escape_by_VISIONARIES
         private void Emma2_click(object sender, EventArgs e)
         {
             removeExtra();
-            if (Riddles == 0)
+
+            if(currentBackground == backbuffer8)
             {
-                Dialogue();
-                DialogueBox.Text = "We made it to the floor below. We're almost free.";
-            } 
-            else if (Riddles == 1)                   //Hint to quesiton 2
-            {
-                Dialogue();
-                DialogueBox.Text = "I guess this question might be related to numbers 1-10...";
+                if (Riddles == 0)
+                {
+                    Dialogue();
+                    DialogueBox.Text = "We made it to the floor below. We're almost free.";
+                }
+                else if (Riddles == 1)                   //Hint to quesiton 2
+                {
+                    Dialogue();
+                    DialogueBox.Text = "I guess this question might be related to numbers 1-10...";
+                }
             }
-            else if (Riddles == 2)                  
+            else if(currentBackground == backbuffer10)
             {
+                currentDialogueLine = new List<string>
+                {
+                  "To get outside of the prison building, the only way is \n pulling down the fire alarm in staff room. \n Wardens are instructed to evacuate prisoners in the case of fire.",
+                 // "However, to access the staff room"
+                };
+                currentDialogueIndex = 0;
+                NpcTitle();
+                npcTitle.Text = "Emma Gibbs";
+                Dialogue();
+                ShowNextLine();
+
+
             }
         }
 
@@ -1477,19 +1542,19 @@ namespace Room_Escape_by_VISIONARIES
         private void picEscape()
         {
             clickableItem = new PictureBox();
-            clickableItem.Width = 230;
-            clickableItem.Height = 290;
-            clickableItem.Location = new Point(1170, 545);
-            clickableItem.BackColor = Color.FromArgb(128, Color.Transparent);
+            clickableItem.Width = 180;
+            clickableItem.Height = 190;
+            clickableItem.Location = new Point(640, 480);
+            clickableItem.BackColor = Color.Transparent;
             clickableItem.Click += Escape_click;
             Controls.Add(clickableItem);
         }
         private void Escape_click(object sender, EventArgs e)
         {
             removeExtra();
-            Dialogue();
-            DialogueBox.Text = "A garbage bin.";
-
+            currentBackground = backbuffer10;
+            Invalidate();
+            background_Change();
         }
 
 
@@ -1542,6 +1607,10 @@ namespace Room_Escape_by_VISIONARIES
                 g.DrawImage(sprite3, rect3);
                 g.DrawImage(sprite2, rect2);
             }
+            if (background == backbuffer10)
+            {
+                g.DrawImage(sprite2, rect2);
+            }
         }   
         private void picArrowL_Click(object sender, EventArgs e)
         {
@@ -1569,8 +1638,16 @@ namespace Room_Escape_by_VISIONARIES
                 currentBackground = backbuffer4;                  //Return Back to cell Hallway from Shower Booth
                 background_Change();
             }
-
-
+            else if (currentBackground == backbuffer12)
+            {
+                currentBackground = backbuffer11;                  //Return to cctv Room from clothing room
+                background_Change();
+            }
+            else if (currentBackground == backbuffer13)
+            {
+                currentBackground = backbuffer12;                  //Return to Clothing room from staff room
+                background_Change();
+            }
 
         }
 
@@ -1595,6 +1672,16 @@ namespace Room_Escape_by_VISIONARIES
             else if (currentBackground == backbuffer7)
             {
                 currentBackground = backbuffer5;              //Return to Kitchen
+                background_Change();
+            }
+            else if (currentBackground == backbuffer11)
+            {
+                currentBackground = backbuffer12;              //Go to Clothing room
+                background_Change();
+            }
+            else if (currentBackground == backbuffer12)
+            {
+                currentBackground = backbuffer13;              //Go to Clothing room
                 background_Change();
             }
         }
@@ -1685,14 +1772,26 @@ namespace Room_Escape_by_VISIONARIES
                 picLight();
                 picEmma2();
             }
-                Invalidate();                //Force the form to RE-DRAW
+            else if (currentBackground == backbuffer9)
+            {
+                Room_Name();
+                RoomName.Text = "Solitary Confinement";
+                picEscape();
+            }
+            else if (currentBackground == backbuffer10)
+            {
+                Room_Name();
+                RoomName.Text = "CCTV Room";
+                picEmma2();
+            }
+
+            Invalidate();                //Force the form to RE-DRAW
         }
     }
 }
 //Goals
 //Fix problem where you can click kitech item when riddle box is open
 //Remove arrowR for backbuffer 1 but make it appear as it goes to backbuffer2
-//As you click on broken wall to move on level 3 the dialogue is skiped from changing background
 //Character idle (If time allows)
 
 
