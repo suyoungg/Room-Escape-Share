@@ -26,7 +26,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             frmMain f1 = new frmMain();
             f1.ShowDialog();
-            this.Close();
+           // this.Close();
         }
 
         private void btnExit_Click(object sender, EventArgs e)

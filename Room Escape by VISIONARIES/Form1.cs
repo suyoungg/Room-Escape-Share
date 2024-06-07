@@ -85,7 +85,10 @@ namespace Room_Escape_by_VISIONARIES
         bool StoveFixed = false;
         bool dialogueComplete = false;                     //Bool to prevent question box popping same time as dialogue box
         bool hiddenSpotClicked = false;                    //To check if an item in level 3 is clicked (To open riddle box when this item is clicked)
-
+        bool brokenWallClicked = false;
+        bool WardenCloth = false;
+        bool UntangleWire = false;
+        bool ElectricityOn = false;
 
         //Counters
         int countBed = 0;                                  //Used so dialogue for 1st time click and 2nd time click on item is diff
@@ -198,7 +201,7 @@ namespace Room_Escape_by_VISIONARIES
                 Controls.Remove(npcTitle);
                 dialogueComplete = true;
 
-                if(currentBackground == backbuffer6)
+                if(brokenWallClicked == true)
                 {
                     currentBackground = backbuffer8;
                     Invalidate();
@@ -628,18 +631,18 @@ namespace Room_Escape_by_VISIONARIES
             //}
 
             //Quick Route to CCTV ROOM
-            if (cellDoorUnlock == true)
-            {
-                Dialogue();
-                DialogueBox.Text = "The cell door is locked.";
-            }
-            else if (cellDoorUnlock == false)
-            {
-                ItemBox.Items.Remove("Master Key");
-                currentBackground = backbuffer10;
-                Invalidate();
-                background_Change();
-            }
+            //if (cellDoorUnlock == true)
+            //{
+            //    Dialogue();
+            //    DialogueBox.Text = "The cell door is locked.";
+            //}
+            //else if (cellDoorUnlock == false)
+            //{
+            //    ItemBox.Items.Remove("Master Key");
+            //    currentBackground = backbuffer10;
+            //    Invalidate();
+            //    background_Change();
+            //}
 
             //Quick Route to Clothing ROOM
             //if (cellDoorUnlock == true)
@@ -650,24 +653,24 @@ namespace Room_Escape_by_VISIONARIES
             //else if (cellDoorUnlock == false)
             //{
             //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer13;
+            //    currentBackground = backbuffer12;
             //    Invalidate();
             //    background_Change();
             //}
 
             ////Quick Route to Staff room
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer13;
-            //    Invalidate();
-            //    background_Change();
-            //}
+            if (cellDoorUnlock == true)
+            {
+                Dialogue();
+                DialogueBox.Text = "The cell door is locked.";
+            }
+            else if (cellDoorUnlock == false)
+            {
+                ItemBox.Items.Remove("Master Key");
+                currentBackground = backbuffer13;
+                Invalidate();
+                background_Change();
+            }
         }
 
         //File Acces for level 2
@@ -1336,7 +1339,7 @@ namespace Room_Escape_by_VISIONARIES
             clickableItem.Width = 125;
             clickableItem.Height = 250;
             clickableItem.Location = new Point(1120, 500);
-            clickableItem.BackColor = Color.Red;
+            clickableItem.BackColor = Color.Transparent;
             clickableItem.Click += brokenWall_click;
             Controls.Add(clickableItem);
         }
@@ -1350,6 +1353,7 @@ namespace Room_Escape_by_VISIONARIES
             }
             else if (ItemBox.Items.Contains("Spoon"))
             {
+                brokenWallClicked = true;
                 Dialogue();
                 ItemBox.Items.Remove("Poutine Recipe");
                 ItemBox.Items.Remove("Spoon");
@@ -1400,7 +1404,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if(currentBackground == backbuffer8)
+            if (currentBackground == backbuffer8)
             {
                 if (Riddles == 0)
                 {
@@ -1413,20 +1417,24 @@ namespace Room_Escape_by_VISIONARIES
                     DialogueBox.Text = "I guess this question might be related to numbers 1-10...";
                 }
             }
-            else if(currentBackground == backbuffer10)
+            else if (currentBackground == backbuffer10)
             {
                 currentDialogueLine = new List<string>
                 {
-                  "To get outside of the prison building, the only way is \n pulling down the fire alarm in staff room. \n Wardens are instructed to evacuate prisoners in the case of fire.",
-                 // "However, to access the staff room"
+                  "To get outside of the prison building, the only way is \n pulling down the fire alarm in staff room. \n As we evacuate we will escape.",
                 };
                 currentDialogueIndex = 0;
                 NpcTitle();
                 npcTitle.Text = "Emma Gibbs";
                 Dialogue();
                 ShowNextLine();
-
-
+            }
+            else if (currentBackground == backbuffer11) 
+            {
+                NpcTitle();
+                npcTitle.Text = "Emma Gibbs";
+                Dialogue();
+                DialogueBox.Text = "Maybe click on the monitor screen before you go.";
             }
         }
 
@@ -1557,9 +1565,286 @@ namespace Room_Escape_by_VISIONARIES
             background_Change();
         }
 
+        //CCTV ROOM CLICKABLE ITEM
+
+        private void picPowerBox()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 170;
+            clickableItem.Height = 220;
+            clickableItem.Location = new Point(1170, 100);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += PowerBox_click;
+            Controls.Add(clickableItem);
+        }
+        private void PowerBox_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            Dialogue();
+            DialogueBox.Text = "You have powered on the electricity";
+            ElectricityOn = true;
+        }
+
+        private void picStep()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 220;
+            clickableItem.Height = 120;
+            clickableItem.Location = new Point(520, 680);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Step_click;
+            Controls.Add(clickableItem);
+        }
+        private void Step_click(object sender, EventArgs e)
+        {
+            removeExtra();
+            
+            if(!ItemBox.Items.Contains("Step"))
+            {
+                Dialogue();
+                DialogueBox.Text = "You have obtained a step";
+                ItemBox.Items.Add("Step");
+            }
+            else
+            {
+                Dialogue();
+                DialogueBox.Text = "You already posses a step";
+            }
+        }
+
+        private void picWire()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 70;
+            clickableItem.Height = 50;
+            clickableItem.Location = new Point(260, 420);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Wire_click;
+            Controls.Add(clickableItem);
+        }
+        private void Wire_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            UntangleWire = true;
+            Dialogue();
+            DialogueBox.Text = "You have untangled the wire knots";
+        }
+
+        private void picMonitor()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 366;
+            clickableItem.Height = 220;
+            clickableItem.Location = new Point(350, 190);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += Monitor_click;
+            Controls.Add(clickableItem);
+        }
+        private void Monitor_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            if(currentBackground == backbuffer10)                         //When monitor screen are not powered on yet
+            {
+                Dialogue();
+                DialogueBox.Text = "The monitor screen is off. You should find a way to power on this.";
+            }
+            else if (currentBackground == backbuffer11)                   //When monitor screen is ON
+            {
+                Dialogue();
+                DialogueBox.Text = "Oh no, Officer French is inside staff room. Before entering the room \n you'll need to change your prisoner cloth to something else.";
+                NpcTitle();
+                npcTitle.Text = "Emma Gibbs";
+         
+            }
+        }
+        private void picWhiteCabinet()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 366;
+            clickableItem.Height = 220;
+            clickableItem.Location = new Point(350, 190);
+            clickableItem.BackColor = Color.FromArgb(128, Color.Transparent);
+            clickableItem.Click += WhiteCabinet_click;
+            Controls.Add(clickableItem);
+        }
+        private void WhiteCabinet_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            if (!ItemBox.Items.Contains("Storage Box Key"))                         //When monitor screen are not powered on yet
+            {
+                Dialogue();
+                DialogueBox.Text = "The monitor screen is off. You should find a way to power on this.";
+            }
+        }
 
 
+        private void picPowerButton()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 40;
+            clickableItem.Height = 50;
+            clickableItem.Location = new Point(320, 485);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += PowerButton_click;
+            Controls.Add(clickableItem);
+        }
+        private void PowerButton_click(object sender, EventArgs e)
+        {
+            removeExtra();
 
+            if(UntangleWire == true && ElectricityOn == true && ItemBox.Items.Contains("Step"))          //When all the conditions are valid background changes to monitor screen ON
+            {
+                currentBackground = backbuffer11;
+                Invalidate();
+                background_Change();
+            }
+            else                                                                                         //Else nothing happens
+            {
+                Dialogue();
+                DialogueBox.Text = "No changes are seen. Maybe something must be activated.";
+            }
+
+        }
+
+        //CLOTHING ROOM CLICKABLE ITEM
+
+        private void picstorageBox()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 260;
+            clickableItem.Height = 150;
+            clickableItem.Location = new Point(75, 640);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += storageBox_click;
+            Controls.Add(clickableItem);
+        }
+        private void storageBox_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            if (ItemBox.Items.Contains("Storage Box Key") && !ItemBox.Items.Contains("Hammer"))       //If user has the key but without a hammer (prevent obtaining item again)
+            {
+                Dialogue();
+                DialogueBox.Text = "You have opended the storage box and obtained a hammer.";
+                ItemBox.Items.Add("Hammer");
+            }
+            else if (!ItemBox.Items.Contains("Storage Box Key"))                                     //If user doesn't have the key
+            {
+                Dialogue();
+                DialogueBox.Text = "Storage Box is locked";
+            }
+        }
+
+        private void picWardenCloth()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 60;
+            clickableItem.Height = 100;
+            clickableItem.Location = new Point(590,110);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += WardenCloth_click;
+            Controls.Add(clickableItem);
+        }
+        private void WardenCloth_click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            if(ItemBox.Items.Contains("Step"))
+            {
+                ItemBox.Items.Remove("Step");
+                Dialogue();
+                DialogueBox.Text = "You have changed your outfit to warden cloth.";
+                WardenCloth = true;
+            }
+            else if (!ItemBox.Items.Contains("Step"))
+            {
+                Dialogue();
+                DialogueBox.Text = "The cloth hung too high to reach.";
+            }
+        }
+
+        //Staff room
+
+        private void picAC()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 600;
+            clickableItem.Height = 120;
+            clickableItem.Location = new Point(445, 30);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += AC_Click;
+            Controls.Add(clickableItem);
+        }
+
+        private void AC_Click(object sender, EventArgs e)
+        {
+            removeExtra();
+            Dialogue();
+            DialogueBox.Text = "The AC is turned on.";
+        }
+
+
+        private void picFireAlarm()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 130;
+            clickableItem.Height = 150;
+            clickableItem.Location = new Point(1245, 175);
+            clickableItem.BackColor = Color.FromArgb(128, Color.Transparent);
+            clickableItem.Click += FireAlarm_Click;
+            Controls.Add(clickableItem);
+        }
+
+        private void FireAlarm_Click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+        }
+
+        private void picStaffCup()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 50;
+            clickableItem.Height = 70;
+            clickableItem.Location = new Point(760, 565);
+            clickableItem.BackColor = Color.Transparent;
+            clickableItem.Click += StaffCup_Click;
+            Controls.Add(clickableItem);
+        }
+
+        private void StaffCup_Click(object sender, EventArgs e)
+        {
+            removeExtra();
+
+            if (!ItemBox.Items.Contains("Cup"))
+            {
+                ItemBox.Items.Add("Cup");
+            }
+        }
+
+        private void picWatch()
+        {
+            clickableItem = new PictureBox();
+            clickableItem.Width = 170;
+            clickableItem.Height = 20;
+            clickableItem.Location = new Point(780, 625);
+            clickableItem.BackColor = Color.FromArgb(128, Color.Transparent);
+            clickableItem.Click += picWatch_Click;
+            Controls.Add(clickableItem);
+        }
+
+        private void picWatch_Click(object sender, EventArgs e)
+        {
+            removeExtra();
+            if(!ItemBox.Items.Contains("Watch"))
+            {
+                ItemBox.Items.Add("Watch");
+            }
+        }
 
 
         private void removeExtra()     //Some controls needs to be removed (ex Dialogue) before opening another one to prevent error.
@@ -1610,6 +1895,14 @@ namespace Room_Escape_by_VISIONARIES
             if (background == backbuffer10)
             {
                 g.DrawImage(sprite2, rect2);
+            }
+            if (background == backbuffer11)
+            {
+                g.DrawImage(sprite2, rect2);
+            }
+            if (background == backbuffer13)
+            {
+                g.DrawImage(sprite, rectDest);
             }
         }   
         private void picArrowL_Click(object sender, EventArgs e)
@@ -1679,10 +1972,19 @@ namespace Room_Escape_by_VISIONARIES
                 currentBackground = backbuffer12;              //Go to Clothing room
                 background_Change();
             }
-            else if (currentBackground == backbuffer12)
+            else if (currentBackground == backbuffer12)         //Go to Staff room
             {
-                currentBackground = backbuffer13;              //Go to Clothing room
-                background_Change();
+                if(WardenCloth == true)                         //IF user have changed their outfit to warden outfit they can enter staff room
+                {
+                    currentBackground = backbuffer13;              
+                    background_Change();
+                }
+                else                                          //Or else they are denied to proceed
+                {
+                    Dialogue();
+                    DialogueBox.Text = "You can't enter the staff room with prisoner's cloth";
+                }
+               
             }
         }
 
@@ -1783,6 +2085,34 @@ namespace Room_Escape_by_VISIONARIES
                 Room_Name();
                 RoomName.Text = "CCTV Room";
                 picEmma2();
+                picStep();
+                picPowerBox();
+                picWire();
+                picPowerButton();
+                picMonitor();
+            }
+            else if (currentBackground == backbuffer11)
+            {
+                Room_Name();
+                RoomName.Text = "CCTV Room";
+                picEmma2();
+                picMonitor();
+            }
+            else if(currentBackground == backbuffer12)
+            {
+                Room_Name();
+                RoomName.Text = "Cloth Room";
+                picstorageBox();
+                picWardenCloth();
+            }
+            else if (currentBackground == backbuffer13)
+            {
+                Room_Name();
+                RoomName.Text = "Staff Room";
+                picAC();
+                picFireAlarm();
+                picStaffCup();
+                picWatch();
             }
 
             Invalidate();                //Force the form to RE-DRAW
@@ -1791,6 +2121,7 @@ namespace Room_Escape_by_VISIONARIES
 }
 //Goals
 //Fix problem where you can click kitech item when riddle box is open
+//Program closing
 //Remove arrowR for backbuffer 1 but make it appear as it goes to backbuffer2
 //Character idle (If time allows)
 
