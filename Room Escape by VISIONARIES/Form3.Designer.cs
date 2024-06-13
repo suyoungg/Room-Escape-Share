@@ -45,6 +45,7 @@
             this.picBack11 = new System.Windows.Forms.PictureBox();
             this.picBack12 = new System.Windows.Forms.PictureBox();
             this.picBack13 = new System.Windows.Forms.PictureBox();
+            this.picMini1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.picBack1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picSprite)).BeginInit();
@@ -61,6 +62,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBack11)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack12)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack13)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picMini1)).BeginInit();
             this.SuspendLayout();
             // 
             // picBack1
@@ -234,11 +236,23 @@
             this.picBack13.TabIndex = 17;
             this.picBack13.TabStop = false;
             // 
+            // picMini1
+            // 
+            this.picMini1.Image = ((System.Drawing.Image)(resources.GetObject("picMini1.Image")));
+            this.picMini1.Location = new System.Drawing.Point(283, 241);
+            this.picMini1.Margin = new System.Windows.Forms.Padding(2);
+            this.picMini1.Name = "picMini1";
+            this.picMini1.Size = new System.Drawing.Size(112, 104);
+            this.picMini1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picMini1.TabIndex = 18;
+            this.picMini1.TabStop = false;
+            // 
             // frmStorage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.picMini1);
             this.Controls.Add(this.picBack13);
             this.Controls.Add(this.picBack12);
             this.Controls.Add(this.picBack11);
@@ -274,6 +288,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picBack11)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack12)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBack13)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picMini1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -296,5 +311,6 @@
         public System.Windows.Forms.PictureBox picBack11;
         public System.Windows.Forms.PictureBox picBack12;
         public System.Windows.Forms.PictureBox picBack13;
+        public System.Windows.Forms.PictureBox picMini1;
     }
 }
