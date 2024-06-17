@@ -1,6 +1,6 @@
 ﻿namespace Room_Escape_by_VISIONARIES
 {
-    partial class form5
+    partial class frmStart
     {
         /// <summary>
         /// Required designer variable.
@@ -28,47 +28,55 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnStart = new System.Windows.Forms.Button();
-            this.btnExit = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStart));
+            this.lblStart = new System.Windows.Forms.Label();
+            this.lblExit = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // btnStart
+            // lblStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(447, 349);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(116, 78);
-            this.btnStart.TabIndex = 0;
-            this.btnStart.Text = "Start";
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            this.lblStart.BackColor = System.Drawing.Color.Transparent;
+            this.lblStart.Font = new System.Drawing.Font("Stencil", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblStart.ForeColor = System.Drawing.Color.White;
+            this.lblStart.Location = new System.Drawing.Point(99, 556);
+            this.lblStart.Name = "lblStart";
+            this.lblStart.Size = new System.Drawing.Size(384, 78);
+            this.lblStart.TabIndex = 3;
+            this.lblStart.Text = "Start Game";
+            this.lblStart.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblStart.Click += new System.EventHandler(this.lblStart_Click);
             // 
-            // btnExit
+            // lblExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(607, 349);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(146, 78);
-            this.btnExit.TabIndex = 1;
-            this.btnExit.Text = "Exit";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.lblExit.BackColor = System.Drawing.Color.Transparent;
+            this.lblExit.Font = new System.Drawing.Font("Stencil", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblExit.ForeColor = System.Drawing.Color.White;
+            this.lblExit.Location = new System.Drawing.Point(99, 675);
+            this.lblExit.Name = "lblExit";
+            this.lblExit.Size = new System.Drawing.Size(384, 78);
+            this.lblExit.TabIndex = 4;
+            this.lblExit.Text = "Exit Game";
+            this.lblExit.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblExit.Click += new System.EventHandler(this.lblExit_Click);
             // 
-            // form5
+            // frmStart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.btnStart);
-            this.Name = "form5";
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.ClientSize = new System.Drawing.Size(800, 831);
+            this.Controls.Add(this.lblExit);
+            this.Controls.Add(this.lblStart);
+            this.DoubleBuffered = true;
+            this.Name = "frmStart";
             this.Text = "Start Display";
-            this.Load += new System.EventHandler(this.form5_Load);
+            this.Load += new System.EventHandler(this.frmStart_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnStart;
-        private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Label lblStart;
+        private System.Windows.Forms.Label lblExit;
     }
 }

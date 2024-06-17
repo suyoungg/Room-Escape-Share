@@ -10,26 +10,27 @@ using System.Windows.Forms;
 
 namespace Room_Escape_by_VISIONARIES
 {
-    public partial class form5 : Form
+    public partial class frmStart : Form
     {
-        public form5()
+        public frmStart()
         {
             InitializeComponent();
         }
 
-        private void form5_Load(object sender, EventArgs e)
+        private void frmStart_Load(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Maximized;
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
+        private void lblStart_Click(object sender, EventArgs e)
         {
-            frmMain f1 = new frmMain();
-            f1.ShowDialog();
-           // this.Close();
+            this.Hide();
+            frmMain Main = new frmMain();
+            Main.ShowDialog();
+            this.Close();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void lblExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }

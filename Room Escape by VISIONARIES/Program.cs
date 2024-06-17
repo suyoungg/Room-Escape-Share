@@ -16,7 +16,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new form5());
+            Application.Run(new frmStart());
         }
     }
 }

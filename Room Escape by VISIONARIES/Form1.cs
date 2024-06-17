@@ -83,8 +83,9 @@ namespace Room_Escape_by_VISIONARIES
         Button SelectionBox2;
 
         //BOOLS
-        bool hideSprite = false;                            //Bool for hiding/showing sprite NPC
+        bool hideSprite = false;                           //Bool for hiding/showing sprite NPC
         bool cellDoorUnlock = false;
+        bool ElectricLockEnabled = false;                 
         bool OvenOpened = false;
         bool StoveFixed = false;
         bool dialogueComplete = false;                     //Bool to prevent question box popping same time as dialogue box
@@ -113,7 +114,7 @@ namespace Room_Escape_by_VISIONARIES
             InitializeComponent();
         }
         private void frmMain_Load(object sender, EventArgs e)
-        { 
+        {
             //Music
             SoundPlayer player = new SoundPlayer();
             player.SoundLocation = AppDomain.CurrentDomain.BaseDirectory + "\\GameMusiclvl1.wav";         //Bring music from a file location
@@ -172,6 +173,12 @@ namespace Room_Escape_by_VISIONARIES
             sprite3 = new Bitmap(frmG.picRiddler.Image, characSize, characSize);
             rect3 = new Rectangle(30, 200, characSize, characSize);
         }
+
+        private void idleTimer_Tick(object sender, EventArgs e)
+        {
+
+        }
+
 
         private void Dialogue()
         {
@@ -305,17 +312,17 @@ namespace Room_Escape_by_VISIONARIES
         //When NPC warden is clicked
         private void warden_Click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);                           //Remove any previous dialogue before opening new dialogue
-            Controls.Remove(npcTitle);
+            removeExtra();                                           //Remove any previous dialogue before opening new dialogue
 
-            if(currentBackground == backbuffer1)                    //Interaction with Ms French in level 1
+
+            if (currentBackground == backbuffer1)                    //Interaction with Ms French in level 1
             {
                 if (!ItemBox.Items.Contains("Cup with water") && !ItemBox.Items.Contains("Master Key"))          //If user don't posses an item called cup with water and doesnt have the key yet
                 {
                     Dialogue();
                     NpcTitle();
                     npcTitle.Text = "Officer French"; 
-                    DialogueBox.Text = "What are you looking at? Go back to your cell. \n God, this place is so dirty, I want to get out of here right now!";
+                    DialogueBox.Text = "What are you looking at? Go back to your cell. \n Gosh, this place is so dirty, I want to get out of here right now!";
                 }
                 else if (ItemBox.Items.Contains("Cup with water") && !ItemBox.Items.Contains("Master Key"))      //If user posses cup with water + !ItemBox.Items.Contains("Master Key") is to prevent from obtaining 2 items
                 {
@@ -341,7 +348,7 @@ namespace Room_Escape_by_VISIONARIES
             {
                 if (ACturnedOn == false)                                  //Dialogue line before ac is on
                 {
-                    currentDialogueLine = new List<string>
+                    currentDialogueLine = new List<string>                //After the first sentence user can have option button
                     {
                     "Who are you? I've never seen you before, I guess you are new.",
                     "Anyways, I am trying to dry my uniform so leave me alone! \n Or do you have something to do with me?",
@@ -355,7 +362,7 @@ namespace Room_Escape_by_VISIONARIES
                     OptionOpen = true;
 
                 }
-                else if (OptionOpen == true && ACturnedOn == true)    //Dialogue line after ac is on and after the FIRST dialogue
+                else if (OptionOpen == true && ACturnedOn == true)      //Dialogue line after ac is on and after the FIRST dialogue
                 {
                     Dialogue();
                     DialogueBox.Text = "What should you hand to Officer French?";
@@ -392,7 +399,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-        private void buttonOptionCup()
+        private void buttonOptionCup()                              //When user obtain a cup it gives user option to hand cup to the npc
         {
             SelectionBox = new Button();
             SelectionBox.Width = 120;
@@ -431,14 +438,13 @@ namespace Room_Escape_by_VISIONARIES
             SelectionBox2.Click += buttonWatch_Click;              //button click event
             Controls.Add(SelectionBox2);
         }
-        private void buttonWatch_Click(object sender, EventArgs e)
+        private void buttonWatch_Click(object sender, EventArgs e)          //Option when user wants to hand watch
         {
             removeExtra();
-
             Dialogue();
             NpcTitle();
             npcTitle.Text = "Officer French"; ;
-            DialogueBox.Text = "Oh my god, the time! It's my shift, I gotta go downstairs";
+            DialogueBox.Text = "Oh no, the time! It's my shift, I gotta go downstairs";
             watchSelected = true;                                           //This make Ms French disappear from the screen
         }
 
@@ -459,8 +465,7 @@ namespace Room_Escape_by_VISIONARIES
         //When NPC image is clicked
         private void EmmaLocked_Click (object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
-            Controls.Remove(npcTitle);
+            removeExtra();
             currentDialogueLine = new List<string>
             {
                "Hey! Please don't leave yet!",
@@ -473,6 +478,7 @@ namespace Room_Escape_by_VISIONARIES
             npcTitle.Text = "Emma Gibbs";
             Dialogue();                  //When user click on dialogue after the first message, they initiate dialogue_click which calls ShowNextLine and it display next message
             ShowNextLine();
+            ElectricLockEnabled = true;
         }
 
        
@@ -491,7 +497,7 @@ namespace Room_Escape_by_VISIONARIES
 
         public void beds_click(object sender, EventArgs e)                        //Click Event. When user click picpeds dialogue box appear
         {
-            Controls.Remove(DialogueBox);                                         //Remove any previously opened dialogue
+            removeExtra();                                                        //Remove any previously opened dialogue
 
             if (countBed == 0)                                                    //For first time clicking
             {
@@ -522,15 +528,15 @@ namespace Room_Escape_by_VISIONARIES
 
         public void Cabinet_Click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
 
             if (countCabinet == 0)                      
             {
-                frmMini1 Mini = new frmMini1();
+                frmMini1 Mini = new frmMini1();                                      //Opens another form for mini game
                 Mini.ShowDialog();
                 Dialogue();
                 DialogueBox.Text = "You found a piece of faucet from the cabinet.";
-                ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");
+                ItemBox.Items.Remove($"Faucet Piece {faucetPiece}/3");              //Remove previous line before adding one
                 faucetPiece++;
                 ItemBox.Items.Add($"Faucet Piece {faucetPiece}/3");
                 countCabinet++;                 
@@ -555,14 +561,15 @@ namespace Room_Escape_by_VISIONARIES
 
         private void faucets_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            //Controls.Remove(DialogueBox);
+            removeExtra();
 
             if (faucetPiece < 3)                                                 //If user hasn't gathered all faucet pieces
             {
                 Dialogue();
                 DialogueBox.Text = "The faucet is broken. \n You might need to find missing pieces to fix.";
             }
-            else if (faucetPiece == 3 && !ItemBox.Items.Contains("Cup"))          //If user has faucets pieces but NO cup
+            else if (faucetPiece == 3 && !ItemBox.Items.Contains("Cup"))         //If user has faucets pieces but NO cup
             {
                 Dialogue();
                 DialogueBox.Text = "Faucet fixed. You hear water drops...";
@@ -592,7 +599,7 @@ namespace Room_Escape_by_VISIONARIES
         }     
         private void LightBulb_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "Light Bulb looks rusty and old.";
         }
@@ -608,7 +615,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void Mirror_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "You see your face reflected in the mirror. You could look better.";
         }
@@ -626,7 +633,7 @@ namespace Room_Escape_by_VISIONARIES
 
         private void towel_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (countTowel == 0)
             {
                 Dialogue();
@@ -656,7 +663,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void cup_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Cup"))                              //When user doesn't posses a cup, give cup
             {
                 Dialogue();
@@ -683,7 +690,7 @@ namespace Room_Escape_by_VISIONARIES
 
         private void ExitPortal_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Master Key"))                            //When user doesn't posses a key item
             {
                 Dialogue();
@@ -709,8 +716,8 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void CellDoor_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
-            if (cellDoorUnlock == false)
+            removeExtra();
+            if (cellDoorUnlock == false)                         //When door is not unlocked yet
             {
                 Dialogue();
                 DialogueBox.Text = "The cell door is locked.";
@@ -830,17 +837,24 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void ElectricLock_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
-            picArrowL.Enabled = false;                                    //Until they enter something none of them are enabled
-            picArrowR.Enabled = false;
-            clickableItem.Enabled = false;
-            clickSprite.Enabled = false;
+            removeExtra();
+            if(ElectricLockEnabled == true)                                   //User MUST click Emma before for context or else they wont be able to do anything
+            {
+                picArrowL.Enabled = false;                                    //Until they enter something none of them are enabled
+                picArrowR.Enabled = false;
+                clickableItem.Enabled = false;
+                clickSprite.Enabled = false;
 
-            Riddle();                                                     //Question Box
-            RiddleBox.Items.Add("                          6 x 4 = 6");
-            RiddleBox.Items.Add("                          8 x 4 = 5");
-            RiddleBox.Items.Add("                          9 x 5 = ?");
-            Lock();                                                       //txtBox for user input  
+                Riddle();                                                     //Question Box
+                RiddleBox.Items.Add("                             6 x 4 = 6");
+                RiddleBox.Items.Add("                             8 x 4 = 5");
+                RiddleBox.Items.Add("                             9 x 5 = ?");
+                Lock();                                                       //txtBox for user input  
+            }
+            else
+            {
+            }
+           
         }
         private void Riddle()
         {
@@ -878,8 +892,7 @@ namespace Room_Escape_by_VISIONARIES
 
             if (e.KeyCode == Keys.Enter)                           //Checks answer from pressing enter
             {
-                Controls.Remove(LockBox);                          //Question and answer box gone after typing ans
-                Controls.Remove(RiddleBox);
+                removeExtra();
 
                 if (currentBackground == backbuffer3)              //For unlocking Emma Gibbs NPC
                 {
@@ -974,14 +987,13 @@ namespace Room_Escape_by_VISIONARIES
                     else if (Riddles == 2)
                     {
                         string ans;
-                        ans = LockBox.Text.ToString().ToUpper();              //Take account of upper case 
+                        ans = LockBox.Text.ToString().ToUpper().Trim();              //Take account of upper case 
                         if (ans == "SHERWOOD")
                         {
                             Dialogue();
                             DialogueBox.Text = "Correct!";
                             Riddles++;                                        //Escape from the loop of question 3 repeating
                             currentBackground = backbuffer9;                  //Change backgrounds again where user can escape the solitary confinemnet
-                            Invalidate();
                             background_Change();
                         }
                         else
@@ -1007,9 +1019,9 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void Vent_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
-            DialogueBox.Text = "You found a scribble written on the vent \n Hint: If C + D = ABC, \n then A + B + C = answer ";
+            DialogueBox.Text = "You found a scribble written on the vent \n Hint: If C + D = AB, \n then A + B  = answer ";
             //9 x 5 = 45, 4 + 5 = 9
         }
 
@@ -1025,9 +1037,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void picEmma_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
-
-
+            removeExtra();
             if (!ItemBox.Items.Contains("Poutine") && !ItemBox.Items.Contains("Poutine Recipe") && !ItemBox.Items.Contains("Spoon"))   //if User didn't completed quest yet
             {
                 currentDialogueLine = new List<string>
@@ -1062,7 +1072,7 @@ namespace Room_Escape_by_VISIONARIES
                     ItemBox.Items.Remove("Poutine");
                 }
             }
-            else if (ItemBox.Items.Contains("Spoon"))    //In case user click Emma again after obtaining the item
+            else if (ItemBox.Items.Contains("Spoon"))    //In case user click Emma again after obtaining the item. Give user hint
             {
                 Dialogue();
                 NpcTitle();
@@ -1216,13 +1226,13 @@ namespace Room_Escape_by_VISIONARIES
         private void Stove_click(object sender, EventArgs e)
         {
             removeExtra();
-            if (StoveFixed == false)
+            if (StoveFixed == false)                            //When stove is not fixed yet
             {
-                frmM2Stove Stove = new frmM2Stove();
+                frmM2Stove Stove = new frmM2Stove();           //Opens another form for mini game
                 Stove.ShowDialog();
                 Dialogue();
                 DialogueBox.Text = "The stove is fixed.";
-                StoveFixed = true;
+                StoveFixed = true;                 
             }
             else
             {
@@ -1244,10 +1254,12 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if (ItemBox.Items.Contains("Potato") && ItemBox.Items.Contains("Canola Oil") && ItemBox.Items.Contains("Gravy Sauce") &&                   //If all materials are collected
+            if (ItemBox.Items.Contains("Potato") && ItemBox.Items.Contains("Canola Oil") && ItemBox.Items.Contains("Gravy Sauce") &&                 //If all materials are collected
                ItemBox.Items.Contains("Pan") && ItemBox.Items.Contains("Knife") && ItemBox.Items.Contains("Cheese") && StoveFixed == true)
             {
                 //Mini game opens
+                frmM2CutBoard cutBoard = new frmM2CutBoard();
+                cutBoard.ShowDialog();
                 ItemBox.Items.Remove("Potato");
                 ItemBox.Items.Remove("Canola Oil");
                 ItemBox.Items.Remove("Gravy Sauce");
@@ -1279,7 +1291,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void potato_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Potato"))
             {
                 Dialogue();
@@ -1305,14 +1317,14 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void tomato_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Tomato"))
             {
                 Dialogue();
                 DialogueBox.Text = "A box of tomato. Mouses like tomatoes.";
                 ItemBox.Items.Add("Tomato");
             }
-            else if (ItemBox.Items.Contains("Tomato"))
+            else if (ItemBox.Items.Contains("Tomato") || ItemBox.Items.Contains("Cheese") || ItemBox.Items.Contains("Frozen Cheese"))
             {
                 Dialogue();
                 DialogueBox.Text = "You don't have enough room for more tomato.";
@@ -1331,7 +1343,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void oil_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Canola Oil"))
             {
                 Dialogue();
@@ -1358,19 +1370,24 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void mouse_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
-            if (!ItemBox.Items.Contains("Tomato"))
+            removeExtra();
+            if (!ItemBox.Items.Contains("Tomato"))               //If user don't have potato
             {
                 Dialogue();
                 DialogueBox.Text = "The mouse looks very hungry. \n Maybe you could offer something.";
             }
-            else if (ItemBox.Items.Contains("Tomato") && !ItemBox.Items.Contains("Frozen Cheese"))
+            else if (ItemBox.Items.Contains("Tomato") && !ItemBox.Items.Contains("Frozen Cheese") && !ItemBox.Items.Contains("Cheese"))  //!ItemBox.Items.Contains("Frozen Cheese") prevents user from obtaining 2 cheese
             {
                 Dialogue();
                 DialogueBox.Text = "The mouse eats the tomato. To repay your kindness,\n he gives you frozen cheese.";
                 ItemBox.Items.Remove("Tomato");
                 ItemBox.Items.Add("Frozen Cheese");
             }    
+            else if(ItemBox.Items.Contains("Frozen Cheese") || ItemBox.Items.Contains("Cheese"))
+            {
+                Dialogue();
+                DialogueBox.Text = "Mouse is not hungry anymore.";
+            }
         }
 
 
@@ -1396,7 +1413,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void showerHead_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "A shower Head.";
         }
@@ -1413,7 +1430,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void hugeMirror_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "The mirror is covered with steam. Someone could write on it.";
         }
@@ -1430,7 +1447,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void scribble_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "23045";
         }
@@ -1448,7 +1465,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void shampoo_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             Dialogue();
             DialogueBox.Text = "A box of shampoo and conditionners";
         }
@@ -1465,7 +1482,7 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void brokenWall_click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);
+            removeExtra();
             if (!ItemBox.Items.Contains("Spoon"))
             {
                 Dialogue();
@@ -1524,7 +1541,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if (currentBackground == backbuffer8)
+            if (currentBackground == backbuffer8)                //Click interaction in solitary confinement room
             {
                 if (Riddles == 0)
                 {
@@ -1541,7 +1558,7 @@ namespace Room_Escape_by_VISIONARIES
                     DialogueBox.Text = "I guess this question might be related to numbers 1-10...";
                 }
             }
-            else if (currentBackground == backbuffer10)
+            else if (currentBackground == backbuffer10)      //Click interaction in CCTV room
             {
                 currentDialogueLine = new List<string>
                 {
@@ -1553,7 +1570,7 @@ namespace Room_Escape_by_VISIONARIES
                 Dialogue();
                 ShowNextLine();
             }
-            else if (currentBackground == backbuffer11) 
+            else if (currentBackground == backbuffer11)   //When CCTV is on
             {
                 Dialogue();
                 NpcTitle();
@@ -1576,7 +1593,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if (Riddles == 2)
+            if (Riddles == 2)       //hint for the 3rd riddle
             {
                 ItemBox.Items.Add("Blank Paper");
                 Dialogue();
@@ -1617,7 +1634,6 @@ namespace Room_Escape_by_VISIONARIES
         private void SingleBed_click(object sender, EventArgs e)
         {
             removeExtra();
-
             Dialogue();
             DialogueBox.Text = "A comfortable looking bed.";
         }
@@ -1640,8 +1656,8 @@ namespace Room_Escape_by_VISIONARIES
             {
                 currentDialogueLine = new List<string>
                 {
-               "That’s an escape hole I made. It is connected \n to another room. You want to use it?",
-               "Sorry but you can’t.\n Unless you can solve my riddles\n Then I will consider it."
+                 "That’s an escape hole I made. It is connected \n to another room. You want to use it?",
+                 "Sorry but you can’t.\n Unless you can solve my riddles\n Then I will consider it."
                 };
                 DialogueIndex = 0;
                 NpcTitle();
@@ -1663,10 +1679,8 @@ namespace Room_Escape_by_VISIONARIES
         private void Bin_click(object sender, EventArgs e)
         {
             removeExtra();
-
             Dialogue();
             DialogueBox.Text = "A garbage bin.";
-            
         }
 
         //Escape Hole in backbuffer9
@@ -1685,8 +1699,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
             ItemBox.Items.Remove("Blank Paper");
-            currentBackground = backbuffer10;
-            Invalidate();
+            currentBackground = backbuffer10;                    //Change background to CCTV room
             background_Change();
         }
 
@@ -1705,7 +1718,6 @@ namespace Room_Escape_by_VISIONARIES
         private void PowerBox_click(object sender, EventArgs e)
         {
             removeExtra();
-
             Dialogue();
             DialogueBox.Text = "You powered on the electricity";
             ElectricityOn = true;
@@ -1751,7 +1763,6 @@ namespace Room_Escape_by_VISIONARIES
         private void Wire_click(object sender, EventArgs e)
         {
             removeExtra();
-
             UntangleWire = true;
             Dialogue();
             DialogueBox.Text = "You untangled the wire knots";
@@ -1770,7 +1781,6 @@ namespace Room_Escape_by_VISIONARIES
         private void Monitor_click(object sender, EventArgs e)
         {
             removeExtra();
-
             if(currentBackground == backbuffer10)                         //When monitor screen are not powered on yet
             {
                 Dialogue();
@@ -1824,7 +1834,6 @@ namespace Room_Escape_by_VISIONARIES
             if(UntangleWire == true && ElectricityOn == true)          //When all the conditions are valid background changes to monitor screen ON
             {
                 currentBackground = backbuffer11;
-                Invalidate();
                 background_Change();
             }
             else                                                                                         //Else nothing happens
@@ -1832,7 +1841,6 @@ namespace Room_Escape_by_VISIONARIES
                 Dialogue();
                 DialogueBox.Text = "No changes are seen. Maybe something must be activated.";
             }
-
         }
 
         //CLOTHING ROOM CLICKABLE ITEM
@@ -1850,14 +1858,14 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if (ItemBox.Items.Contains("Storage Box Key") && !ItemBox.Items.Contains("Hammer"))       //If user has the key but without a hammer (prevent obtaining item again)
+            if (ItemBox.Items.Contains("Storage Box Key") && !ItemBox.Items.Contains("Hammer"))        //If user has the key but without a hammer (prevent obtaining item again)
             {
                 Dialogue();
                 DialogueBox.Text = "You opened the storage box and obtained a hammer.";
                 ItemBox.Items.Add("Hammer");
                 ItemBox.Items.Remove("Storage Box Key");
             }
-            else if (!ItemBox.Items.Contains("Storage Box Key") && !ItemBox.Items.Contains("Hammer"))                                     //If user doesn't have the key
+            else if (!ItemBox.Items.Contains("Storage Box Key") && !ItemBox.Items.Contains("Hammer"))    //If user doesn't have the key
             {
                 Dialogue();
                 DialogueBox.Text = "Storage Box is locked";
@@ -1878,7 +1886,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if(ItemBox.Items.Contains("Step"))                                         //if User posses a step
+            if(ItemBox.Items.Contains("Step") && WardenCloth == false)               //if User posses a step
             {
                 ItemBox.Items.Remove("Step");
                 Dialogue();
@@ -1922,7 +1930,7 @@ namespace Room_Escape_by_VISIONARIES
             }
             else
             {
-
+             //Before clicking the npc dialogue nothing pops up
             }
         }
 
@@ -1942,7 +1950,7 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
 
-            if(MsFrenchGone == false)
+            if(MsFrenchGone == false)                          //When the npc is still present in the room
             {
                 Dialogue();
                 NpcTitle();
@@ -1950,9 +1958,12 @@ namespace Room_Escape_by_VISIONARIES
                 DialogueBox.Text = "Hey! Do not touch the fire alarm. \n That is only for the case of emergency.";
 
             }
-            else if (MsFrenchGone == true)
+            else if (MsFrenchGone == true && ItemBox.Items.Contains("Hammer"))
             {
-                //Ending Credit???
+                this.Hide();
+                frmEndScreen endScreen = new frmEndScreen();
+                endScreen.ShowDialog();
+                this.Close();
             }
         }
 
@@ -2004,7 +2015,7 @@ namespace Room_Escape_by_VISIONARIES
         }
 
 
-        private void removeExtra()     //Some controls needs to be removed (ex Dialogue) before opening another one to prevent error.
+        private void removeExtra()                              //Some controls needs to be removed (ex Dialogue) before opening another one to prevent error.
         {
             Controls.Remove(RiddleBox);
             Controls.Remove(LockBox);
@@ -2018,8 +2029,6 @@ namespace Room_Escape_by_VISIONARIES
         {
             Graphics g = e.Graphics;
             drawBackground(g, currentBackground);                   //Send and receive info from drawbackground about what background to paint
-
-            //Never forget invalidate !!!!!!!!
         }
 
         private void drawBackground(Graphics g, Bitmap background)
@@ -2069,11 +2078,9 @@ namespace Room_Escape_by_VISIONARIES
         }   
         private void picArrowL_Click(object sender, EventArgs e)
         {
-            Controls.Remove(DialogueBox);                         //For better UX, if user move between rooms without removing dialogue yet it automatically does
-            Controls.Remove(LockBox);                          
-            Controls.Remove(RiddleBox);
+            removeExtra();                                          //For better UX, if user move between rooms without removing dialogue yet it automatically does
 
-            if (currentBackground == backbuffer1)                          //For level 1, when cell door is still locked
+            if (currentBackground == backbuffer1)                    //For level 1, when cell door is still locked
             {
                 currentBackground = backbuffer2;
                 background_Change();
@@ -2105,6 +2112,7 @@ namespace Room_Escape_by_VISIONARIES
             }
 
         }
+
 
         private void picArrowR_Click(object sender, EventArgs e)
         {
@@ -2282,7 +2290,6 @@ namespace Room_Escape_by_VISIONARIES
                 picStaffCup();
                 picWatch();
             }
-
             Invalidate();                //Force the form to RE-DRAW
         }
     }
