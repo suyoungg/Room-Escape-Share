@@ -22,7 +22,6 @@ namespace Room_Escape_by_VISIONARIES
 {
     public partial class frmMain : Form
     {
-
         Graphics g;
         frmStorage frmG = new frmStorage();          //This is the form where background and sprite are stored
         Bitmap backbuffer1;                          //For room1     
@@ -83,14 +82,14 @@ namespace Room_Escape_by_VISIONARIES
         Button SelectionBox2;
 
         //BOOLS
-        bool hideSprite = false;                           //Bool for hiding/showing sprite NPC
+        bool hideSprite = false;                     //Bool for hiding/showing sprite NPC
         bool cellDoorUnlock = false;
         bool ElectricLockEnabled = false;                 
         bool OvenOpened = false;
         bool StoveFixed = false;
-        bool dialogueComplete = false;                     //Bool to prevent question box popping same time as dialogue box
-        bool hiddenSpotClicked = false;                    //To check if an item in level 3 is clicked (To open riddle box when this item is clicked)
-        bool brokenWallClicked = false;                    //Bool so it switches background AFTER a dialogue
+        bool dialogueComplete = false;               //Bool to prevent question box popping same time as dialogue box
+        bool hiddenSpotClicked = false;              //To check if an item in level 3 is clicked (To open riddle box when this item is clicked)
+        bool brokenWallClicked = false;              //Bool so it switches background AFTER a dialogue
         bool WardenCloth = false;
         bool UntangleWire = false;
         bool ElectricityOn = false;
@@ -100,11 +99,15 @@ namespace Room_Escape_by_VISIONARIES
         bool watchSelected = false;
 
         //Counters
-        int countBed = 0;                                  //Used so dialogue for 1st time click and 2nd time click on item is diff
+        int countBed = 0;                             //Used so dialogue for 1st time click and 2nd time click on item is diff
         int countCabinet = 0;
         int countTowel = 0;
         int countCup = 0;
         int countWatch = 0;
+
+        //Ms French NPC movement animation
+        List<Image> playerFrames;
+        int currentFrameIndex;
 
         //File Access
         string filePath = Application.StartupPath + "\\Checklist.txt";
@@ -161,9 +164,8 @@ namespace Room_Escape_by_VISIONARIES
             picArrowL.Location = new Point(arrowXL, arrowY);                                      //Location for arrow Left
             picArrowR.Location = new Point(arrowX, arrowY);                                       //Location for arrow Right
 
-            //Ms French sprite location 
-            sprite = new Bitmap(frmG.picSprite.Image, characSize, characSize);
-            rectDest = new Rectangle(830, 250, characSize, characSize);
+            //Ms French sprite 
+            SetUp();
 
             //Emma NPC
             sprite2 = new Bitmap(frmG.picEmma.Image, characSize, characSize);
@@ -174,12 +176,27 @@ namespace Room_Escape_by_VISIONARIES
             rect3 = new Rectangle(30, 200, characSize, characSize);
         }
 
+        private void SetUp()
+        {
+            playerFrames = new List<Image>();          //Since there are multiple images(frames) it has to be a list
+            for (int i = 0; i <= 4; i++)               //Go through all of 5 frames (0~4)
+            {
+                string filePath = $@"C:\Users\seun0554\OneDrive - Hamilton Wentworth District School Board\ICS4\VISIONARIES\Room Escape by VISIONARIES\Room Escape by VISIONARIES\bin\Debug\player\\tile{i:000}.png";
+                playerFrames.Add(Image.FromFile(filePath));
+            }
+            idleTimer.Interval = 500;             //Time interval
+            idleTimer.Tick += idleTimer_Tick;     //Timer event (this shows the frame changes)
+            idleTimer.Start();
+        }
+
         private void idleTimer_Tick(object sender, EventArgs e)
         {
-
+            currentFrameIndex = (currentFrameIndex + 1) % 4;      //Move on to next frame and divide by 4 (total amount of frame)
+            this.Invalidate();                                    //Update changes
         }
 
 
+        //Dialogue box display
         private void Dialogue()
         {
             //Create a new Label for Dialogue Box
@@ -197,11 +214,13 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.BringToFront();                                            //Bring diologue on top of every layers so picbox don't go over
         }
 
-        private void DialogueBox_Click(object sender, EventArgs e)                 //When user click dialogue box,
+        //When user click dialogue box
+        private void DialogueBox_Click(object sender, EventArgs e)                
         {
             ShowNextLine();                                                        //First check if there is a next line
         }
 
+        //Move onto next dialogue line
         private void ShowNextLine()            
         {
            if(DialogueIndex < currentDialogueLine.Count)                  //As long as current index is smaller than the amount of dialogue prepared
@@ -314,7 +333,6 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();                                           //Remove any previous dialogue before opening new dialogue
 
-
             if (currentBackground == backbuffer1)                    //Interaction with Ms French in level 1
             {
                 if (!ItemBox.Items.Contains("Cup with water") && !ItemBox.Items.Contains("Master Key"))          //If user don't posses an item called cup with water and doesnt have the key yet
@@ -399,6 +417,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //lvl3 //choose cup option
         private void buttonOptionCup()                              //When user obtain a cup it gives user option to hand cup to the npc
         {
             SelectionBox = new Button();
@@ -424,6 +443,7 @@ namespace Room_Escape_by_VISIONARIES
             ItemBox.Items.Remove("Cup");
         }
 
+        //lvl3 //choose watch option
         private void buttonWatch()
         {
             SelectionBox2 = new Button();
@@ -466,6 +486,7 @@ namespace Room_Escape_by_VISIONARIES
         private void EmmaLocked_Click (object sender, EventArgs e)
         {
             removeExtra();
+            //
             currentDialogueLine = new List<string>
             {
                "Hey! Please don't leave yet!",
@@ -483,7 +504,8 @@ namespace Room_Escape_by_VISIONARIES
 
        
 
-        //CLICKABLE ITEMS
+        //CLICKABLE ITEMS //lvl1
+        //Beds
         public void picBeds()
         {
             clickableItem = new PictureBox();
@@ -515,7 +537,8 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-        public void picCabinet()                                                    //Repeat same procedure as picBeds
+        //Cabinet
+        public void picCabinet()                                                  //Repeat same procedure as picBeds
         {
             clickableItem = new PictureBox();
             clickableItem.Width = 172;
@@ -548,6 +571,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Faucet
         private void picfaucets()
         {
             clickableItem = new PictureBox();
@@ -587,6 +611,7 @@ namespace Room_Escape_by_VISIONARIES
             }       
         }
 
+        //LightBulb
         private void picLightBulb()
         {
             clickableItem = new PictureBox();
@@ -603,6 +628,8 @@ namespace Room_Escape_by_VISIONARIES
             Dialogue();
             DialogueBox.Text = "Light Bulb looks rusty and old.";
         }
+
+        //Mirror
         private void picMirror()
         {
             clickableItem = new PictureBox();
@@ -620,6 +647,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "You see your face reflected in the mirror. You could look better.";
         }
 
+        //Towel
         private void picTowel()
         {
             clickableItem = new PictureBox();
@@ -651,6 +679,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Cup
         private void picCup()
         {
             clickableItem = new PictureBox();
@@ -677,6 +706,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //To exit cell
         private void picExitPortal()
         {
             clickableItem = new PictureBox();
@@ -704,6 +734,7 @@ namespace Room_Escape_by_VISIONARIES
             }    
         }
 
+        //Cell door
         private void picCellDoor()
         {
             clickableItem = new PictureBox();
@@ -728,79 +759,10 @@ namespace Room_Escape_by_VISIONARIES
                 currentBackground = backbuffer3;                 //Change background to level 2
                 background_Change();                             //To call items that are in level 2 room 1
             }
-
-            //Quick Route to level 2
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer3;
-            //    Invalidate();
-            //    background_Change();
-            //}
-
-            //Quick Route to level 3
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer8;
-            //    Invalidate();
-            //    background_Change();
-            //}
-
-            //Quick Route to CCTV ROOM
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer13;
-            //    Invalidate();
-            //    background_Change();
-            //}
-
-            //Quick Route to Clothing ROOM
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer12;
-            //    Invalidate();
-            //    background_Change();
-            //}
-
-            ////Quick Route to Staff room
-            //if (cellDoorUnlock == true)
-            //{
-            //    Dialogue();
-            //    DialogueBox.Text = "The cell door is locked.";
-            //}
-            //else if (cellDoorUnlock == false)
-            //{
-            //    ItemBox.Items.Remove("Master Key");
-            //    currentBackground = backbuffer13;
-            //    Invalidate();
-            //    background_Change();
-            //}
         }
 
-        //File Acces for level 2
+        //LEVEL 2
+        //File Access for level 2
         private void fileAccess()
         {
             try
@@ -824,7 +786,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-        //Level 2 Clickable Item
+        //Level 2 Clickable Item //Emma cell lock
         private void picElectricLock()
         {
             clickableItem = new PictureBox();
@@ -856,6 +818,8 @@ namespace Room_Escape_by_VISIONARIES
             }
            
         }
+
+        //Question boxes
         private void Riddle()
         {
             RiddleBox = new ListBox();
@@ -870,6 +834,7 @@ namespace Room_Escape_by_VISIONARIES
             RiddleBox.BringToFront();
         }
 
+        //Answer text boxes
         private void Lock()
         {
             LockBox = new TextBox();
@@ -886,6 +851,8 @@ namespace Room_Escape_by_VISIONARIES
             LockBox.BringToFront();
 
         }
+
+        //Answer questions in text box
         private void answer_enter(object sender, KeyEventArgs e)
         {
             int answer;                                            //User Input
@@ -896,7 +863,7 @@ namespace Room_Escape_by_VISIONARIES
 
                 if (currentBackground == backbuffer3)              //For unlocking Emma Gibbs NPC
                 {
-                    if (int.TryParse(LockBox.Text, out answer))
+                    if (int.TryParse(LockBox.Text.Trim(), out answer))
                     {
                         if (answer == 9)
                         {
@@ -1007,6 +974,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Vent for hint
         private void picVent()
         {
             clickableItem = new PictureBox();
@@ -1025,6 +993,7 @@ namespace Room_Escape_by_VISIONARIES
             //9 x 5 = 45, 4 + 5 = 9
         }
 
+        //Emma outside cell
         private void picEmma()
         {
             clickableItem = new PictureBox();
@@ -1038,6 +1007,7 @@ namespace Room_Escape_by_VISIONARIES
         private void picEmma_click(object sender, EventArgs e)
         {
             removeExtra();
+            //Emma after unlocked
             if (!ItemBox.Items.Contains("Poutine") && !ItemBox.Items.Contains("Poutine Recipe") && !ItemBox.Items.Contains("Spoon"))   //if User didn't completed quest yet
             {
                 currentDialogueLine = new List<string>
@@ -1081,7 +1051,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-
+        //Oven
         private void picOven()
         {
             clickableItem = new PictureBox();
@@ -1116,6 +1086,7 @@ namespace Room_Escape_by_VISIONARIES
             } 
         }
 
+        //Knife
         private void picKnife()
         {
             clickableItem = new PictureBox();
@@ -1142,6 +1113,8 @@ namespace Room_Escape_by_VISIONARIES
             }  
 
         }
+
+        //Pan
         private void picPan()
         {
             clickableItem = new PictureBox();
@@ -1168,6 +1141,8 @@ namespace Room_Escape_by_VISIONARIES
             }
           
         }
+
+        //Plate
         private void picPlate()
         {
             clickableItem = new PictureBox();
@@ -1185,6 +1160,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "A clean plate.";
         }
 
+        //Cupboard
         private void picCupBoard()
         {
             clickableItem = new PictureBox();
@@ -1195,7 +1171,6 @@ namespace Room_Escape_by_VISIONARIES
             clickableItem.Click += cupBoard_click;
             Controls.Add(clickableItem);
         }
-
         private void cupBoard_click(object sender, EventArgs e)
         {
             removeExtra();
@@ -1212,7 +1187,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-
+        //Stove
         private void picStove()
         {
             clickableItem = new PictureBox();
@@ -1240,6 +1215,8 @@ namespace Room_Escape_by_VISIONARIES
                 DialogueBox.Text = "The stove is fixed.";
             }
         }
+
+        //CuttingBoard
         private void picCuttingBoard()
         {
             clickableItem = new PictureBox();
@@ -1253,7 +1230,7 @@ namespace Room_Escape_by_VISIONARIES
         private void cuttingBoard_click(object sender, EventArgs e)
         {
             removeExtra();
-
+            //if all ingredients are gathered, open mini game
             if (ItemBox.Items.Contains("Potato") && ItemBox.Items.Contains("Canola Oil") && ItemBox.Items.Contains("Gravy Sauce") &&                 //If all materials are collected
                ItemBox.Items.Contains("Pan") && ItemBox.Items.Contains("Knife") && ItemBox.Items.Contains("Cheese") && StoveFixed == true)
             {
@@ -1272,13 +1249,14 @@ namespace Room_Escape_by_VISIONARIES
                 Dialogue();
                 DialogueBox.Text = "You successfully cooked a poutine!";
             }
-            else
+            else //if all ingredients are not gathered
             {
                 Dialogue();
                 DialogueBox.Text = "A cutting board. You don't have all the items yet.";
             }
         }
 
+        //Potato Box
         private void picPotato()
         {
             clickableItem = new PictureBox();
@@ -1305,6 +1283,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Tomato Box
         private void picTomato()
         {
             clickableItem = new PictureBox();
@@ -1331,6 +1310,7 @@ namespace Room_Escape_by_VISIONARIES
             }     
         }
 
+        //Oil Barrel
         private void picOil()
         {
             clickableItem = new PictureBox();
@@ -1357,7 +1337,7 @@ namespace Room_Escape_by_VISIONARIES
             }   
         }
 
-
+        //Mouse
         private void picMouse()
         {
             clickableItem = new PictureBox();
@@ -1371,7 +1351,8 @@ namespace Room_Escape_by_VISIONARIES
         private void mouse_click(object sender, EventArgs e)
         {
             removeExtra();
-            if (!ItemBox.Items.Contains("Tomato"))               //If user don't have potato
+            //conditions for mouse to give user cheese
+            if (!ItemBox.Items.Contains("Tomato"))               //If user don't have tomato
             {
                 Dialogue();
                 DialogueBox.Text = "The mouse looks very hungry. \n Maybe you could offer something.";
@@ -1383,14 +1364,14 @@ namespace Room_Escape_by_VISIONARIES
                 ItemBox.Items.Remove("Tomato");
                 ItemBox.Items.Add("Frozen Cheese");
             }    
-            else if(ItemBox.Items.Contains("Frozen Cheese") || ItemBox.Items.Contains("Cheese"))
+            else if(ItemBox.Items.Contains("Frozen Cheese") || ItemBox.Items.Contains("Cheese")) //if user already has cheese
             {
                 Dialogue();
                 DialogueBox.Text = "Mouse is not hungry anymore.";
             }
         }
 
-
+        //Shower head
         private void picShowerHead()
         {
             clickableItem = new PictureBox();
@@ -1418,6 +1399,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "A shower Head.";
         }
 
+        //Mirror
         private void picHugeMirror()
         {
             clickableItem = new PictureBox();
@@ -1434,7 +1416,8 @@ namespace Room_Escape_by_VISIONARIES
             Dialogue();
             DialogueBox.Text = "The mirror is covered with steam. Someone could write on it.";
         }
-        private void picScribble()
+        //Hint for oven password on huge mirror
+        private void picScribble() 
         {
             clickableItem = new PictureBox();
             clickableItem.Width = 90;
@@ -1449,9 +1432,10 @@ namespace Room_Escape_by_VISIONARIES
         {
             removeExtra();
             Dialogue();
-            DialogueBox.Text = "23045";
+            DialogueBox.Text = "23045"; //oven hint
         }
 
+        //Shampoo
         private void picShampoo()
         {
             clickableItem = new PictureBox();
@@ -1470,6 +1454,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "A box of shampoo and conditionners";
         }
 
+        //Route to lvl3 when spoon is obtained
         private void picBrokenWall ()
         {
             clickableItem = new PictureBox();
@@ -1482,25 +1467,26 @@ namespace Room_Escape_by_VISIONARIES
         }
         private void brokenWall_click(object sender, EventArgs e)
         {
-            removeExtra();
+            removeExtra();  
+            //Dialogue before you get Emma poutine
             if (!ItemBox.Items.Contains("Spoon"))
             {
                 Dialogue();
                 DialogueBox.Text = "The wall tile is broken. The inside looks soft \n almost like you can dig through if you had an ITEM.";
             }
-            else if (ItemBox.Items.Contains("Spoon"))
+            else if (ItemBox.Items.Contains("Spoon")) //After Emma gets poutine
             {
                 brokenWallClicked = true;                     //To move on level 3 AFTER the dialogue
-                Dialogue();
-                ItemBox.Items.Remove("Poutine Recipe");
-                ItemBox.Items.Remove("Spoon");
+                Dialogue();    
+                ItemBox.Items.Clear();                        //Removing items from previous stage
+                ItemBox.Items.Add("ITEM BOX");
                 DialogueBox.Text = "You started digging the wall with spoon, on and on \n until you start seeing light.";
             }
         }
 
 
         //Level 3 Clickable items
-
+        //Riddler NPC
         private void picRiddler()
         {
             clickSprite2 = new PictureBox();
@@ -1526,6 +1512,7 @@ namespace Room_Escape_by_VISIONARIES
             Dialogue();                 
             ShowNextLine();
         }
+        //Emma NPC in lvl3
         private void picEmma2()                  //Need another location for emma
         {
             clickableItem = new PictureBox();
@@ -1579,6 +1566,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Hint for riddle 3
         private void picBlankPaper()
         {
             clickSprite2 = new PictureBox();
@@ -1597,9 +1585,10 @@ namespace Room_Escape_by_VISIONARIES
             {
                 ItemBox.Items.Add("Blank Paper");
                 Dialogue();
-                DialogueBox.Text = "You can see slight letters written on paper but it's blurry. \n What can you do to see better? \n *Obatained a blank paper*";
+                DialogueBox.Text = "You can see slight letters written on paper but it's blurry. \n What can you do to see better? \n *Obtained a blank paper*";
             }
         }
+        //Interaction with blank paper 
         private void picLight()
         { 
             clickSprite2 = new PictureBox();
@@ -1613,7 +1602,7 @@ namespace Room_Escape_by_VISIONARIES
         private void Light_click(object sender, EventArgs e)
         {
             removeExtra();
-
+            //Tell user what to do with blank paper
             if (Riddles == 2 && ItemBox.Items.Contains("Blank Paper"))         //Hint for 3rd Question
             {
                 Dialogue();
@@ -1621,6 +1610,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Ridller Bed
         private void picSingleBed()
         {
             clickableItem = new PictureBox();
@@ -1638,6 +1628,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "A comfortable looking bed.";
         }
 
+        //Activate riddle
         private void picHidddenSpot()
         {
             clickableItem = new PictureBox();
@@ -1666,6 +1657,8 @@ namespace Room_Escape_by_VISIONARIES
                 ShowNextLine();
             }
         }
+
+        //Garbage bin in lvl3
         private void picBin()
         {
             clickableItem = new PictureBox();
@@ -1684,7 +1677,6 @@ namespace Room_Escape_by_VISIONARIES
         }
 
         //Escape Hole in backbuffer9
-
         private void picEscape()
         {
             clickableItem = new PictureBox();
@@ -1698,13 +1690,15 @@ namespace Room_Escape_by_VISIONARIES
         private void Escape_click(object sender, EventArgs e)
         {
             removeExtra();
+            ItemBox.Items.Clear();
+            ItemBox.Items.Add("ITEM BOX");
             ItemBox.Items.Remove("Blank Paper");
             currentBackground = backbuffer10;                    //Change background to CCTV room
             background_Change();
         }
 
-        //CCTV ROOM CLICKABLE ITEM
-
+        //CCTV ROOM CLICKABLE ITEMS
+        //Power box
         private void picPowerBox()
         {
             clickableItem = new PictureBox();
@@ -1723,6 +1717,7 @@ namespace Room_Escape_by_VISIONARIES
             ElectricityOn = true;
         }
 
+        //Step
         private void picStep()
         {
             clickableItem = new PictureBox();
@@ -1736,7 +1731,7 @@ namespace Room_Escape_by_VISIONARIES
         private void Step_click(object sender, EventArgs e)
         {
             removeExtra();
-            
+            //conditions for step
             if(!ItemBox.Items.Contains("Step"))
             {
                 Dialogue();
@@ -1750,6 +1745,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Tangled red wire
         private void picWire()
         {
             clickableItem = new PictureBox();
@@ -1768,6 +1764,7 @@ namespace Room_Escape_by_VISIONARIES
             DialogueBox.Text = "You untangled the wire knots";
         }
 
+        //Monitor
         private void picMonitor()
         {
             clickableItem = new PictureBox();
@@ -1795,6 +1792,8 @@ namespace Room_Escape_by_VISIONARIES
          
             }
         }
+
+        //Cabinet to get storage box key
         private void picWhiteCabinet()
         {
             clickableItem = new PictureBox();
@@ -1817,6 +1816,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Power monitor
         private void picPowerButton()
         {
             clickableItem = new PictureBox();
@@ -1872,6 +1872,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Get disguise 
         private void picWardenCloth()
         {
             clickableItem = new PictureBox();
@@ -1885,7 +1886,7 @@ namespace Room_Escape_by_VISIONARIES
         private void WardenCloth_click(object sender, EventArgs e)
         {
             removeExtra();
-
+            //condition to obtain warden disguise
             if(ItemBox.Items.Contains("Step") && WardenCloth == false)               //if User posses a step
             {
                 ItemBox.Items.Remove("Step");
@@ -1907,7 +1908,7 @@ namespace Room_Escape_by_VISIONARIES
         }
 
         //Staff room
-
+        //AC
         private void picAC()
         {
             clickableItem = new PictureBox();
@@ -1928,13 +1929,18 @@ namespace Room_Escape_by_VISIONARIES
                 DialogueBox.Text = "The AC is turned on. You see Officer French's uniform drying.";
                 ACturnedOn = true;
             }
+            else if (MsFrenchGone == true )                   //After Ms french is gone AC dialogue change
+            {
+                Dialogue();
+                DialogueBox.Text = "You hear AC running quietly.";
+            }
             else
             {
              //Before clicking the npc dialogue nothing pops up
             }
         }
 
-
+        //Fire Alarm
         private void picFireAlarm()
         {
             clickableItem = new PictureBox();
@@ -1949,7 +1955,7 @@ namespace Room_Escape_by_VISIONARIES
         private void FireAlarm_Click(object sender, EventArgs e)
         {
             removeExtra();
-
+            //conditons to end game
             if(MsFrenchGone == false)                          //When the npc is still present in the room
             {
                 Dialogue();
@@ -1958,15 +1964,21 @@ namespace Room_Escape_by_VISIONARIES
                 DialogueBox.Text = "Hey! Do not touch the fire alarm. \n That is only for the case of emergency.";
 
             }
-            else if (MsFrenchGone == true && ItemBox.Items.Contains("Hammer"))
+            else if (MsFrenchGone == true && ItemBox.Items.Contains("Hammer")) //Open end Screen
             {
                 this.Hide();
                 frmEndScreen endScreen = new frmEndScreen();
                 endScreen.ShowDialog();
                 this.Close();
             }
+            else if (!ItemBox.Items.Contains("Hammer"))                        //When user don't have hammer to break and access the fire alarm
+            {
+                Dialogue();
+                DialogueBox.Text = "Need something to break the protection glasss.";
+            }
         }
 
+        //Obtained cup for Option 1
         private void picStaffCup()
         {
             clickableItem = new PictureBox();
@@ -1991,6 +2003,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
+        //Obtain watch for Option 2
         private void picWatch()
         {
             clickableItem = new PictureBox();
@@ -2014,7 +2027,7 @@ namespace Room_Escape_by_VISIONARIES
             }
         }
 
-
+        //Remove previous dialogues, riddle boxes, etc.
         private void removeExtra()                              //Some controls needs to be removed (ex Dialogue) before opening another one to prevent error.
         {
             Controls.Remove(RiddleBox);
@@ -2025,12 +2038,14 @@ namespace Room_Escape_by_VISIONARIES
             Controls.Remove(SelectionBox2);
         }
 
+        //Paint Event
         private void frmMain_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             drawBackground(g, currentBackground);                   //Send and receive info from drawbackground about what background to paint
         }
 
+        //draw different backgrounds
         private void drawBackground(Graphics g, Bitmap background)
         {
             //Derfault background is backbuffer1 unless user move between rooms
@@ -2040,13 +2055,16 @@ namespace Room_Escape_by_VISIONARIES
             {
                 if(hideSprite == false)             //Sprite will be on display UNTIL user spill water to npc and make the sprite leave. (hidesprite statement becomes true)
                 {
-                    g.DrawImage(sprite, rectDest);
+                    if (playerFrames.Count > 0)
+                    {
+                        g.DrawImage(playerFrames[currentFrameIndex], new Point(880, 290));
+                    }
                 }
                 wardenClick();
                 picCellDoor();
                 picExitPortal();
             }    
-            if(background == backbuffer4)
+            if(background == backbuffer4) 
             {
                 g.DrawImage(sprite2, rect2);
             }
@@ -2072,7 +2090,7 @@ namespace Room_Escape_by_VISIONARIES
             {
                 if (MsFrenchGone == false)             //Sprite will be on display UNTIL user spill water to npc and make the sprite leave. (hidesprite statement becomes true)
                 {
-                    g.DrawImage(sprite, rectDest);
+                    g.DrawImage(playerFrames[currentFrameIndex], new Point(880, 320));
                 }
             }
         }   
@@ -2294,8 +2312,6 @@ namespace Room_Escape_by_VISIONARIES
         }
     }
 }
-//Goals
-//Program closing
-//Character idle (If time allows)
+
 
 

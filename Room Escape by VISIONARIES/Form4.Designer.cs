@@ -69,7 +69,7 @@
             this.Controls.Add(this.lblStart);
             this.DoubleBuffered = true;
             this.Name = "frmStart";
-            this.Text = "Start Display";
+            this.Text = "Prison Escape";
             this.Load += new System.EventHandler(this.frmStart_Load);
             this.ResumeLayout(false);
 

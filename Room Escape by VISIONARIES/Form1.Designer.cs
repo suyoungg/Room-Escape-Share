@@ -74,7 +74,7 @@
             this.Controls.Add(this.picArrowL);
             this.DoubleBuffered = true;
             this.Name = "frmMain";
-            this.Text = "Room Escape";
+            this.Text = "Prison Escape";
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.frmMain_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.picArrowL)).EndInit();
